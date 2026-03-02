@@ -1,0 +1,71 @@
+# Guest Booking + Admin Dashboard Redesign
+
+## Overview
+Major architecture change: **bookings are for guest users** (no registration required). Only **one admin** can register/login to manage bookings in the dashboard. The booking form collects guest contact info instead of requiring auth.
+
+---
+
+## Database Changes (Supabase SQL Editor)
+
+> [!IMPORTANT]
+> You must run this SQL in your Supabase SQL Editor before testing.
+
+```sql
+-- Drop old foreign key and make user_id nullable
+ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_user_id_fkey;
+ALTER TABLE bookings ALTER COLUMN user_id DROP NOT NULL;
+
+-- Add guest contact fields
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS guest_name VARCHAR(255);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS guest_email VARCHAR(255);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS guest_phone VARCHAR(50);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS guest_message TEXT;
+
+-- Allow anyone to insert bookings (guest users)
+DROP POLICY IF EXISTS "Bookings insertable by user" ON bookings;
+CREATE POLICY "Anyone can create bookings" ON bookings FOR INSERT WITH CHECK (true);
+
+-- Allow anyone to insert profiles (for admin)
+CREATE POLICY IF NOT EXISTS "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+```
+
+---
+
+## Frontend Changes
+
+### [MODIFY] [bookingSlice.ts](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/store/slices/bookingSlice.ts)
+- Remove auth requirement from `createBooking`
+- Add guest fields: `guestName`, `guestEmail`, `guestPhone`, `guestMessage`
+- Insert `user_id: null` (guest booking)
+
+### [MODIFY] [booking/page.tsx](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/app/booking/page.tsx)
+- Remove auth redirect — anyone can book
+- Add form fields: Name, Email, Phone, Message
+- Keep: Pickup Date, Return Date, Location, Car selection
+
+### [MODIFY] [BrowseCarsSection.tsx](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/components/BrowseCarsSection.tsx)
+- Add pickup date input to the browse section
+
+### [MODIFY] [Navbar.tsx](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/components/Navbar.tsx)
+- Remove Login button from public navbar (guests don't need auth)
+
+### [MODIFY] [dashboard/page.tsx](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/app/dashboard/page.tsx)
+- Use a separate **admin sidebar nav** (not the public Navbar)
+- Show all bookings with guest contact info
+- Admin-only: protected by middleware
+
+### [MODIFY] [register/page.tsx](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/app/auth/register/page.tsx)
+- Check if any user already exists → if yes, block registration
+- Only the first registered user becomes admin
+
+### [MODIFY] [middleware.ts](file:///d:/car%20rental%20landing%20page/nextjs-frontend/src/middleware.ts)
+- Remove `/booking` from protected routes (now public)
+- Keep `/dashboard` protected for admin only
+
+---
+
+## Verification
+- Build passes (`npm run build`)
+- Guest can book without login
+- Admin can login and see all bookings in dashboard
+- Registration blocked after first admin registers
