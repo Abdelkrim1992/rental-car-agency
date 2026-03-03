@@ -52,10 +52,10 @@ export function ScheduleSection() {
                 {/* Tab Navigation */}
                 <div className="flex items-center gap-4">
                     <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                        {["Day", "Week", "Month"].map((tab) => (
+                        {(["Day", "Week", "Month"] as const).map((tab) => (
                             <button
                                 key={tab}
-                                onClick={() => setRange(tab as any)}
+                                onClick={() => setRange(tab)}
                                 className={cn(
                                     "px-4 py-1.5 text-sm rounded-md transition-all",
                                     range === tab ? "bg-white shadow-sm text-gray-900" : "text-gray-600 hover:bg-white hover:shadow-sm"

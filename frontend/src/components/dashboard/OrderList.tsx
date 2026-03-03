@@ -16,30 +16,37 @@ interface OrderEntry {
     status: string;
     statusColor: string;
     avatar: string | null;
+    carImage: string | null;
 }
 
 export function OrderList() {
     const { bookings, loading: bookingsLoading } = useAppSelector((s) => s.booking);
+    const { cars } = useAppSelector((s) => s.cars);
 
-    const realOrders: OrderEntry[] = bookings.map((booking, idx) => ({
-        id: booking.id?.slice(0, 5) || String(idx + 1).padStart(5, "0"),
-        vehicle: booking.car_name || "Unknown Car",
-        plate: "—",
-        customer: booking.guest_name || "Guest",
-        phone: booking.guest_phone || "—",
-        startDate: booking.pickup_date || "—",
-        endDate: booking.return_date || "—",
-        status: booking.status || "pending",
-        statusColor:
-            booking.status === "confirmed"
-                ? "bg-green-500"
-                : booking.status === "pending"
-                    ? "bg-yellow-500"
-                    : booking.status === "completed"
-                        ? "bg-blue-500"
-                        : "bg-gray-400",
-        avatar: null,
-    }));
+    const realOrders: OrderEntry[] = bookings.map((booking, idx) => {
+        const matchedCar = cars.find(c => c.name === booking.car_name || c.id === booking.car_id);
+
+        return {
+            id: booking.id?.slice(0, 5) || String(idx + 1).padStart(5, "0"),
+            vehicle: booking.car_name || "Unknown Car",
+            plate: "—",
+            customer: booking.guest_name || "Guest",
+            phone: booking.guest_phone || "—",
+            startDate: booking.pickup_date || "—",
+            endDate: booking.return_date || "—",
+            status: booking.status || "pending",
+            statusColor:
+                booking.status === "confirmed"
+                    ? "bg-green-500"
+                    : booking.status === "pending"
+                        ? "bg-yellow-500"
+                        : booking.status === "completed"
+                            ? "bg-blue-500"
+                            : "bg-gray-400",
+            avatar: null,
+            carImage: matchedCar?.img || null,
+        };
+    });
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
@@ -71,18 +78,28 @@ export function OrderList() {
                         {paginatedOrders.map((order) => (
                             <div key={order.id} className="p-6">
                                 {/* Status Badge & ID */}
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm font-normal text-gray-900">{order.id}</span>
-                                            <span
-                                                className={`${order.statusColor} text-white text-[10px] uppercase px-2 py-0.5 rounded`}
-                                            >
-                                                {order.status}
-                                            </span>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-start gap-3">
+                                        {order.carImage ? (
+                                            <div className="w-12 h-10 relative bg-slate-100 rounded overflow-hidden flex-shrink-0 border border-slate-200">
+                                                <Image src={order.carImage} alt={order.vehicle} fill className="object-cover" />
+                                            </div>
+                                        ) : (
+                                            <div className="w-12 h-10 bg-slate-100 rounded flex-shrink-0 flex items-center justify-center border border-slate-200 text-slate-400">
+                                                <span className="text-xs">No Img</span>
+                                            </div>
+                                        )}
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm font-semibold text-gray-900">{order.id}</span>
+                                                <span
+                                                    className={`${order.statusColor} text-white text-[10px] uppercase px-2 py-0.5 rounded-full font-medium tracking-wide`}
+                                                >
+                                                    {order.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-sm font-medium text-gray-700">{order.vehicle}</p>
                                         </div>
-                                        <p className="text-sm font-normal text-gray-900">{order.vehicle}</p>
-                                        <p className="text-xs text-gray-500">{order.plate}</p>
                                     </div>
                                 </div>
 

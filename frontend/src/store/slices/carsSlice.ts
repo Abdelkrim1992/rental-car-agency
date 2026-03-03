@@ -34,7 +34,7 @@ export const fetchCars = createAsyncThunk("cars/fetchCars", async (_, { rejectWi
         if (error) throw new Error(error.message);
 
         // Supabase schema maps image_url -> img, type_name -> type, etc. based on previous DB usage
-        const mappedCars = data.map((c: any) => ({
+        const mappedCars = data.map((c: Record<string, unknown>) => ({
             id: c.id,
             name: c.name,
             price: `$${c.price_per_day}/Day`,
@@ -117,7 +117,7 @@ export const createCar = createAsyncThunk("cars/createCar", async (carData: Part
 export const updateCar = createAsyncThunk("cars/updateCar", async ({ id, updates }: { id: string, updates: Partial<BrowseCar> }, { rejectWithValue }) => {
     try {
         const supabase = createClient();
-        const dbUpdates: any = {};
+        const dbUpdates: Record<string, unknown> = {};
         if (updates.name) dbUpdates.name = updates.name;
         if (updates.price) dbUpdates.price_per_day = parseInt(updates.price.replace(/[^0-9]/g, '') || "0");
         if (updates.fuel) dbUpdates.fuel = updates.fuel;

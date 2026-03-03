@@ -1,0 +1,14 @@
+[functions]
+  directory = "netlify/functions"
+  external_node_modules = ["express", "cors", "dotenv", "jsonwebtoken", "bcryptjs", "uuid", "multer", "nodemailer", "stripe", "serverless-http"]
+
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = "dist"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/index/:splat"
+  status = 200
+  force = true

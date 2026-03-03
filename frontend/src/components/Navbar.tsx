@@ -9,8 +9,6 @@ const navLinks = [
     { label: "HOME", href: "/" },
     { label: "ABOUT", href: "/#why-us" },
     { label: "OUR FLEET", href: "/cars" },
-    { label: "MY BOOKINGS", href: "/bookings" },
-    { label: "CONTACT", href: "/#contact" },
 ];
 
 interface NavbarProps {

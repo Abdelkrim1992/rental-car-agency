@@ -25,7 +25,7 @@ const initialState: ReviewsState = {
 
 export const fetchReviews = createAsyncThunk("reviews/fetchReviews", async (_, { rejectWithValue }) => {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/reviews`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://atlascarrental-backend.netlify.app"}/api/reviews`);
         if (!res.ok) throw new Error("Failed to fetch reviews");
         return (await res.json()) as Review[];
     } catch {
