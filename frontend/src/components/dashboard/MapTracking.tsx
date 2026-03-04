@@ -1,16 +1,17 @@
-"use client";
-
 import { useState, useMemo, useEffect, useRef } from "react";
 import { GoogleMap, useLoadScript, Marker, InfoWindow } from "@react-google-maps/api";
-import { Search } from "lucide-react";
+import { Search, MapPin, Navigation, Car, User, Phone } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { Booking, geocodeLocation, updateBooking } from "@/store/slices/bookingSlice";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const containerStyle = {
     width: "100%",
     height: "100%",
     minHeight: "500px",
-    borderRadius: "0.75rem"
 };
 
 const defaultCenter = {
@@ -106,96 +107,124 @@ export function MapTracking() {
 
     if (loadError) return <div className="p-6 text-red-500">Error loading maps.</div>;
 
+    const getStatusVariant = (status: string) => {
+        switch (status) {
+            case "confirmed": return "default";
+            case "pending": return "secondary";
+            case "completed": return "outline";
+            default: return "outline";
+        }
+    };
+
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                <h2 className="text-lg text-gray-900 font-semibold">Live Map Tracking</h2>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search Guest, Car, or Location..."
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-6">
+                <div>
+                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <Navigation className="h-5 w-5 text-muted-foreground" />
+                        Live Map Tracking
+                    </CardTitle>
+                </div>
+                <div className="relative w-full max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Search guest, car, or location..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full sm:w-80 pl-4 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+                        className="pl-9 h-10"
                     />
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 </div>
-            </div>
+            </CardHeader>
+            <CardContent>
+                <div className="relative border rounded-xl overflow-hidden min-h-[500px] bg-muted/20">
+                    {!isLoaded ? (
+                        <div className="p-4 space-y-4">
+                            <Skeleton className="h-[460px] w-full" />
+                        </div>
+                    ) : (
+                        <GoogleMap
+                            mapContainerStyle={containerStyle}
+                            center={defaultCenter}
+                            zoom={5}
+                            onLoad={map => { mapRef.current = map; }}
+                            onClick={() => setSelectedBooking(null)}
+                            options={{
+                                disableDefaultUI: false,
+                                zoomControl: true,
+                                mapTypeControl: false,
+                                scaleControl: true,
+                                streetViewControl: false,
+                                rotateControl: false,
+                                fullscreenControl: true,
+                                styles: [
+                                    {
+                                        featureType: "poi",
+                                        elementType: "labels",
+                                        stylers: [{ visibility: "off" }]
+                                    }
+                                ]
+                            }}
+                        >
+                            {filteredBookings.map(b => {
+                                if (!b.booking_lat || !b.booking_lng) return null;
+                                return (
+                                    <Marker
+                                        key={b.id}
+                                        position={{ lat: b.booking_lat, lng: b.booking_lng }}
+                                        icon={getMarkerIcon(b.status)}
+                                        onClick={() => setSelectedBooking(b)}
+                                    />
+                                );
+                            })}
 
-            {/* Map Container */}
-            <div className="relative bg-gray-100 rounded-xl overflow-hidden min-h-[500px]">
-                {!isLoaded ? (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                ) : (
-                    <GoogleMap
-                        mapContainerStyle={containerStyle}
-                        center={defaultCenter}
-                        zoom={5}
-                        onLoad={map => { mapRef.current = map; }}
-                        onClick={() => setSelectedBooking(null)}
-                        options={{
-                            disableDefaultUI: false,
-                            zoomControl: true,
-                            mapTypeControl: false,
-                            scaleControl: true,
-                            streetViewControl: false,
-                            rotateControl: false,
-                            fullscreenControl: true,
-                            styles: [
-                                {
-                                    featureType: "poi",
-                                    elementType: "labels",
-                                    stylers: [{ visibility: "off" }]
-                                }
-                            ]
-                        }}
-                    >
-                        {filteredBookings.map(b => {
-                            if (!b.booking_lat || !b.booking_lng) return null;
-                            return (
-                                <Marker
-                                    key={b.id}
-                                    position={{ lat: b.booking_lat, lng: b.booking_lng }}
-                                    icon={getMarkerIcon(b.status)}
-                                    onClick={() => setSelectedBooking(b)}
-                                />
-                            );
-                        })}
-
-                        {selectedBooking && selectedBooking.booking_lat && selectedBooking.booking_lng && (
-                            <InfoWindow
-                                position={{ lat: selectedBooking.booking_lat, lng: selectedBooking.booking_lng }}
-                                onCloseClick={() => setSelectedBooking(null)}
-                            >
-                                <div className="p-1 max-w-[200px]">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className={`w-2 h-2 rounded-full ${selectedBooking.status === 'confirmed' ? 'bg-green-500' : selectedBooking.status === 'pending' ? 'bg-yellow-500' : selectedBooking.status === 'completed' ? 'bg-blue-500' : 'bg-black'}`} />
-                                        <span className="text-[10px] uppercase font-bold text-gray-600 tracking-wider">
-                                            {selectedBooking.status}
-                                        </span>
+                            {selectedBooking && selectedBooking.booking_lat && selectedBooking.booking_lng && (
+                                <InfoWindow
+                                    position={{ lat: selectedBooking.booking_lat, lng: selectedBooking.booking_lng }}
+                                    onCloseClick={() => setSelectedBooking(null)}
+                                >
+                                    <div className="p-2 min-w-[180px]">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Badge variant={getStatusVariant(selectedBooking.status) as any} className="text-[10px] uppercase font-bold px-1.5 py-0 h-4">
+                                                {selectedBooking.status}
+                                            </Badge>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <Car className="h-3.5 w-3.5 text-muted-foreground" />
+                                                <h3 className="font-bold text-sm tracking-tight">{selectedBooking.car_name}</h3>
+                                            </div>
+                                            <div className="flex items-center gap-2 pl-0.5">
+                                                <User className="h-3 w-3 text-muted-foreground" />
+                                                <p className="text-xs font-medium">{selectedBooking.guest_name}</p>
+                                            </div>
+                                            <div className="flex items-center gap-2 pl-0.5">
+                                                <Phone className="h-3 w-3 text-muted-foreground" />
+                                                <p className="text-[10px] text-muted-foreground">{selectedBooking.guest_phone}</p>
+                                            </div>
+                                            <div className="mt-3 pt-2 border-t border-dashed space-y-1">
+                                                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                                    <MapPin className="h-3 w-3" />
+                                                    Range
+                                                </div>
+                                                <p className="text-[11px] font-semibold">
+                                                    {new Date(selectedBooking.pickup_date).toLocaleDateString()} - {new Date(selectedBooking.return_date).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <h3 className="font-bold text-gray-900 text-sm">{selectedBooking.car_name}</h3>
-                                    <p className="text-xs text-gray-600 mt-1">{selectedBooking.guest_name}</p>
-                                    <p className="text-xs text-gray-500">{selectedBooking.guest_phone}</p>
-                                    <div className="mt-2 text-[11px] text-gray-500 bg-gray-50 p-2 rounded border border-gray-100">
-                                        {selectedBooking.pickup_date} <br /> to {selectedBooking.return_date}
-                                    </div>
-                                </div>
-                            </InfoWindow>
-                        )}
-                    </GoogleMap>
-                )}
-            </div>
+                                </InfoWindow>
+                            )}
+                        </GoogleMap>
+                    )}
+                </div>
 
-            <div className="mt-4 flex flex-wrap gap-4 text-xs font-medium text-gray-600">
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-yellow-500" /> Pending</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-500" /> Confirmed</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500" /> Completed</div>
-                <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-gray-900" /> Cancelled</div>
-            </div>
-        </div>
+                <div className="mt-4 flex flex-wrap gap-4 text-[11px] uppercase tracking-widest font-bold text-muted-foreground/60">
+                    <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm" /> Pending</div>
+                    <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm" /> Confirmed</div>
+                    <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" /> Completed</div>
+                    <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-gray-900 shadow-sm" /> Cancelled</div>
+                </div>
+            </CardContent>
+        </Card>
     );
 }

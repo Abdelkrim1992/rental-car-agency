@@ -120,6 +120,7 @@ router.patch("/:id", authMiddleware, async (req: AuthRequest, res: Response) => 
 router.post("/guest", async (req: Request, res: Response) => {
     try {
         const {
+            car_id,
             car_name,
             pickup_date,
             return_date,
@@ -133,29 +134,34 @@ router.post("/guest", async (req: Request, res: Response) => {
             guest_message,
         } = req.body;
 
-        if (!car_name || !pickup_date || !return_date || !pickup_location) {
-            res.status(400).json({ error: "Missing required booking fields" });
+        if ((!car_id && !car_name) || !pickup_date || !return_date || !pickup_location) {
+            res.status(400).json({ error: "Missing required booking fields (car, dates, or location)" });
             return;
         }
 
-        // Look up the car by name
-        const { data: carRow, error: carError } = await supabaseAdmin
-            .from("cars")
-            .select("id")
-            .eq("name", car_name)
-            .limit(1)
-            .single();
+        let finalCarId = car_id;
 
-        if (carError || !carRow) {
-            res.status(404).json({ error: "Car not found in database" });
-            return;
+        // If no car_id, look up by name
+        if (!finalCarId && car_name) {
+            const { data: carRow, error: carError } = await supabaseAdmin
+                .from("cars")
+                .select("id")
+                .eq("name", car_name)
+                .limit(1)
+                .single();
+
+            if (carError || !carRow) {
+                res.status(404).json({ error: `Car "${car_name}" not found in database.` });
+                return;
+            }
+            finalCarId = carRow.id;
         }
 
         const { data, error } = await supabaseAdmin
             .from("bookings")
             .insert({
-                user_id: null,
-                car_id: carRow.id,
+                user_id: null, // Guest bookings don't have a user_id
+                car_id: finalCarId,
                 pickup_date,
                 return_date,
                 pickup_location,
@@ -171,7 +177,18 @@ router.post("/guest", async (req: Request, res: Response) => {
             .select("*, cars(name, image_url)")
             .single();
 
-        if (error) throw error;
+        if (error) {
+            if (error.code === '23502' && error.message.includes('user_id')) {
+                res.status(500).json({
+                    error: "Database configuration error: 'user_id' in bookings table must be nullable to support guest bookings. Please run: ALTER TABLE bookings ALTER COLUMN user_id DROP NOT NULL;"
+                });
+                return;
+            }
+            throw error;
+        }
+
+        // No redundant block here
+        if (!data) throw new Error("Booking insertion failed to return data");
 
         const bookingResult = {
             id: data.id,

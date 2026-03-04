@@ -45,7 +45,7 @@ export default function RegisterPage() {
     if (checking) {
         return (
             <div className="min-h-screen bg-[#fafafa] font-['Inter',sans-serif]">
-                <Navbar />
+                <Navbar variant="transparent" />
                 <div className="flex items-center justify-center py-24"><p className="text-gray-400">Loading...</p></div>
             </div>
         );
@@ -53,7 +53,7 @@ export default function RegisterPage() {
 
     return (
         <div className="min-h-screen bg-[#fafafa] font-['Inter',sans-serif]">
-            <Navbar />
+            <Navbar variant="transparent" />
             <div className="flex items-center justify-center py-16 px-6">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[440px]">
                     <div className="text-center mb-8">

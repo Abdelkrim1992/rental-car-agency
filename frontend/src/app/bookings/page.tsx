@@ -34,7 +34,7 @@ export default function MyBookingsPage() {
 
     return (
         <main className="min-h-screen bg-slate-50 font-['Inter'] flex flex-col">
-            <Navbar variant="solid" />
+            <Navbar variant="transparent" />
 
             <div className="flex-1 py-16 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto w-full space-y-8 mt-10">
                 <div className="space-y-2 text-center">

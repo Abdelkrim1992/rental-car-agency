@@ -100,6 +100,7 @@ export const createBooking = createAsyncThunk(
     "booking/createBooking",
     async (
         bookingData: {
+            car_id: string;
             car_name: string;
             pickup_date: string;
             return_date: string;

@@ -5,21 +5,37 @@ import { updateBooking, deleteBooking } from "@/store/slices/bookingSlice";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { User, Phone, MapPin, Plus } from "lucide-react";
+import { User, Phone, MapPin, Plus, MoreHorizontal, Check, X, Eye, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function BookingsPage() {
     const dispatch = useAppDispatch();
     const { bookings, loading } = useAppSelector((state) => state.booking);
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState("10");
 
-    const totalPages = Math.ceil(bookings.length / rowsPerPage);
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const paginatedBookings = bookings.slice(startIndex, startIndex + rowsPerPage);
+    const rows = parseInt(rowsPerPage);
+    const totalPages = Math.ceil(bookings.length / rows);
+    const startIndex = (currentPage - 1) * rows;
+    const paginatedBookings = bookings.slice(startIndex, startIndex + rows);
 
     const handleStatusChange = (id: string, status: "confirmed" | "cancelled") => {
         dispatch(updateBooking({ id, updates: { status } }));
@@ -31,100 +47,130 @@ export default function BookingsPage() {
         }
     };
 
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case "confirmed": return <Badge className="bg-green-500 hover:bg-green-600 font-bold uppercase text-[10px]">Confirmed</Badge>;
+            case "pending": return <Badge variant="secondary" className="font-bold uppercase text-[10px]">Pending</Badge>;
+            case "completed": return <Badge variant="outline" className="font-bold uppercase text-[10px] border-blue-200 text-blue-600 bg-blue-50">Completed</Badge>;
+            default: return <Badge variant="destructive" className="font-bold uppercase text-[10px]">Cancelled</Badge>;
+        }
+    };
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">Reservations</h1>
-                    <p className="text-sm text-slate-500">Live feed of all customer bookings.</p>
+                <div className="space-y-1">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Reservations</h1>
+                    <p className="text-muted-foreground font-medium">Manage and track all customer booking cycles.</p>
                 </div>
-                <Button className="bg-slate-900 text-white gap-2" asChild>
+                <Button className="h-11 px-6 shadow-lg shadow-primary/20 gap-2" asChild>
                     <Link href="/dashboard/bookings/add">
                         <Plus className="w-4 h-4" /> Create New Booking
                     </Link>
                 </Button>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>All Bookings</CardTitle>
-                    <CardDescription>
-                        {bookings.length} reservations found in the database.
+            <Card className="border-none shadow-xl bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-2xl font-bold">Booking Directory</CardTitle>
+                    <CardDescription className="text-sm font-medium">
+                        Showing data from {bookings.length} reservations.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="rounded-md border">
+                    <div className="rounded-xl border bg-background/50 overflow-hidden">
                         {loading ? (
-                            <div className="py-20 flex justify-center items-center">
-                                <span className="text-sm text-slate-500">Loading bookings...</span>
+                            <div className="py-32 flex flex-col items-center justify-center gap-4">
+                                <span className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></span>
+                                <span className="text-sm font-bold text-muted-foreground animate-pulse uppercase tracking-widest">Loading database...</span>
                             </div>
                         ) : bookings.length === 0 ? (
-                            <div className="py-20 flex justify-center items-center text-slate-400">
-                                <span className="text-sm">No bookings exist yet.</span>
+                            <div className="py-32 flex flex-col items-center justify-center text-muted-foreground gap-2">
+                                <Calendar className="h-12 w-12 opacity-20" />
+                                <span className="text-sm font-bold uppercase tracking-widest opacity-50">No active bookings</span>
                             </div>
                         ) : (
                             <Table>
-                                <TableHeader>
+                                <TableHeader className="bg-muted/50">
                                     <TableRow>
-                                        <TableHead className="w-[100px]">Status</TableHead>
-                                        <TableHead>Customer</TableHead>
-                                        <TableHead>Dates</TableHead>
-                                        <TableHead>Vehicle</TableHead>
-                                        <TableHead className="text-right">Total</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="w-[120px] font-bold uppercase text-[10px] tracking-widest">Status</TableHead>
+                                        <TableHead className="font-bold uppercase text-[10px] tracking-widest">Customer</TableHead>
+                                        <TableHead className="font-bold uppercase text-[10px] tracking-widest">Vehicle & Location</TableHead>
+                                        <TableHead className="font-bold uppercase text-[10px] tracking-widest">Dates</TableHead>
+                                        <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest">Amount</TableHead>
+                                        <TableHead className="text-right font-bold uppercase text-[10px] tracking-widest">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {paginatedBookings.map((b) => (
-                                        <TableRow key={b.id}>
+                                        <TableRow key={b.id} className="hover:bg-muted/30 transition-colors">
                                             <TableCell>
-                                                {b.status === "confirmed" ? (
-                                                    <Badge className="bg-green-500 hover:bg-green-600">Confirmed</Badge>
-                                                ) : b.status === "pending" ? (
-                                                    <Badge variant="outline" className="border-orange-200 text-orange-600 bg-orange-50">Pending</Badge>
-                                                ) : b.status === "completed" ? (
-                                                    <Badge className="bg-blue-500 hover:bg-blue-600">Completed</Badge>
-                                                ) : (
-                                                    <Badge variant="secondary">Cancelled</Badge>
-                                                )}
+                                                {getStatusBadge(b.status || "pending")}
                                             </TableCell>
                                             <TableCell>
-                                                <div className="flex flex-col gap-1">
-                                                    <div className="font-medium text-slate-900 flex items-center gap-1.5 hover:underline cursor-pointer">
-                                                        <User className="w-3 h-3 text-slate-400" /> {b.guest_name}
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="font-bold text-sm tracking-tight flex items-center gap-2 group cursor-pointer">
+                                                        <Avatar className="h-6 w-6 border">
+                                                            <AvatarFallback className="text-[10px] font-bold bg-muted">{b.guest_name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                                        </Avatar>
+                                                        <span className="group-hover:text-primary transition-colors">{b.guest_name}</span>
                                                     </div>
-                                                    <div className="text-xs text-slate-500 flex items-center gap-1.5">
-                                                        <Phone className="w-3 h-3 text-slate-400" /> {b.guest_phone || "No phone"}
+                                                    <div className="text-[10px] text-muted-foreground font-medium flex items-center gap-2 pl-8">
+                                                        <Phone className="w-3 h-3" /> {b.guest_phone || "—"}
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="text-sm">
-                                                    <span className="text-slate-900 block">{b.pickup_date}</span>
-                                                    <span className="text-slate-400 text-xs text-muted-foreground block">→ {b.return_date}</span>
+                                                <div className="space-y-1">
+                                                    <span className="font-bold text-sm block tracking-tight">{b.car_name}</span>
+                                                    <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1.5">
+                                                        <MapPin className="w-3 h-3 text-primary/50" /> {b.pickup_location}
+                                                    </span>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <span className="font-medium block">{b.car_name}</span>
-                                                <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                                                    <MapPin className="w-3 h-3" /> {b.pickup_location}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-right font-medium text-slate-900 text-base">
-                                                ${b.total_price?.toLocaleString()}
+                                                <div className="text-[11px] font-bold space-y-0.5">
+                                                    <span className="text-foreground block">{new Date(b.pickup_date).toLocaleDateString()}</span>
+                                                    <span className="text-muted-foreground block text-[9px] font-medium uppercase tracking-tighter">to {new Date(b.return_date).toLocaleDateString()}</span>
+                                                </div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    {b.status === "pending" && (
-                                                        <>
-                                                            <Button size="sm" variant="outline" className="text-green-600 border-green-200 bg-green-50 hover:bg-green-100" onClick={() => handleStatusChange(b.id, "confirmed")}>Accept</Button>
-                                                            <Button size="sm" variant="outline" className="text-red-600 border-red-200 bg-red-50 hover:bg-red-100" onClick={() => handleDeleteBooking(b.id)}>Refuse</Button>
-                                                        </>
-                                                    )}
-                                                    <Button size="sm" variant="secondary" asChild>
-                                                        <Link href={`/dashboard/bookings/${b.id}`}>Details</Link>
-                                                    </Button>
-                                                </div>
+                                                <span className="font-black text-sm tracking-tighter">
+                                                    ${Number(b.total_price || 0).toLocaleString()}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-48">
+                                                        <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Options</DropdownMenuLabel>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/dashboard/bookings/${b.id}`} className="flex items-center gap-2">
+                                                                <Eye className="h-4 w-4" /> View Full Details
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        {b.status === "pending" && (
+                                                            <>
+                                                                <DropdownMenuItem className="text-green-600 focus:text-green-600 focus:bg-green-50" onClick={() => handleStatusChange(b.id, "confirmed")}>
+                                                                    <Check className="h-4 w-4 mr-2" /> Confirm Booking
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => handleDeleteBooking(b.id)}>
+                                                                    <X className="h-4 w-4 mr-2" /> Refuse / Cancel
+                                                                </DropdownMenuItem>
+                                                            </>
+                                                        )}
+                                                        {b.status !== "pending" && (
+                                                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10" onClick={() => handleDeleteBooking(b.id)}>
+                                                                <X className="h-4 w-4 mr-2" /> Permanently Delete
+                                                            </DropdownMenuItem>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -132,45 +178,43 @@ export default function BookingsPage() {
                             </Table>
                         )}
                         {!loading && bookings.length > 0 && (
-                            <div className="flex items-center justify-between px-4 py-4 border-t">
-                                <div className="flex items-center gap-2 text-sm text-slate-500">
-                                    <span>Rows per page:</span>
-                                    <select
-                                        value={rowsPerPage}
-                                        onChange={(e) => {
-                                            setRowsPerPage(Number(e.target.value));
-                                            setCurrentPage(1);
-                                        }}
-                                        className="border-slate-200 rounded-md text-sm py-1 bg-white"
-                                    >
-                                        <option value={5}>5</option>
-                                        <option value={10}>10</option>
-                                        <option value={20}>20</option>
-                                        <option value={50}>50</option>
-                                    </select>
+                            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-6 border-t bg-muted/20 gap-4">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Rows per page:</span>
+                                    <Select value={rowsPerPage} onValueChange={(val) => { setRowsPerPage(val); setCurrentPage(1); }}>
+                                        <SelectTrigger className="w-[80px] h-8 text-xs font-bold">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="5">5</SelectItem>
+                                            <SelectItem value="10">10</SelectItem>
+                                            <SelectItem value="20">20</SelectItem>
+                                            <SelectItem value="50">50</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
-                                <div className="flex items-center gap-4 text-sm">
-                                    <span className="text-slate-500">
-                                        Showing {startIndex + 1}-{Math.min(startIndex + rowsPerPage, bookings.length)} of {bookings.length}
+                                <div className="flex items-center gap-6">
+                                    <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                                        {startIndex + 1}-{Math.min(startIndex + rows, bookings.length)} OF {bookings.length}
                                     </span>
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-2">
                                         <Button
                                             variant="outline"
                                             size="icon"
-                                            className="w-8 h-8"
+                                            className="w-10 h-10 shadow-sm"
                                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                                             disabled={currentPage === 1}
                                         >
-                                            <ChevronLeft className="w-4 h-4" />
+                                            <ChevronLeft className="w-5 h-5" />
                                         </Button>
                                         <Button
                                             variant="outline"
                                             size="icon"
-                                            className="w-8 h-8"
+                                            className="w-10 h-10 shadow-sm"
                                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                                             disabled={currentPage === totalPages}
                                         >
-                                            <ChevronRight className="w-4 h-4" />
+                                            <ChevronRight className="w-5 h-5" />
                                         </Button>
                                     </div>
                                 </div>

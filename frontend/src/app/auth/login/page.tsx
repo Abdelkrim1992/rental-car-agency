@@ -69,7 +69,7 @@ function LoginContent() {
 export default function LoginPage() {
     return (
         <div className="min-h-screen bg-[#fafafa] font-['Inter',sans-serif]">
-            <Navbar />
+            <Navbar variant="transparent" />
             <Suspense fallback={<div className="flex items-center justify-center py-24"><p className="text-gray-400">Loading...</p></div>}>
                 <LoginContent />
             </Suspense>

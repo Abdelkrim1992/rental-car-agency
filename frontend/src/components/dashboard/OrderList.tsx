@@ -1,9 +1,12 @@
-"use client";
-
 import Image from "next/image";
 import { useState } from "react";
-import { Calendar, Phone, User, CalendarDays, MapPin } from "lucide-react";
+import { Calendar, Phone, User, ChevronRight, ChevronLeft } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface OrderEntry {
     id: string;
@@ -14,7 +17,6 @@ interface OrderEntry {
     startDate: string;
     endDate: string;
     status: string;
-    statusColor: string;
     avatar: string | null;
     carImage: string | null;
 }
@@ -27,7 +29,7 @@ export function OrderList() {
         const matchedCar = cars.find(c => c.name === booking.car_name || c.id === booking.car_id);
 
         return {
-            id: booking.id?.slice(0, 5) || String(idx + 1).padStart(5, "0"),
+            id: booking.id?.slice(0, 8).toUpperCase() || `ORD-${idx + 1}`,
             vehicle: booking.car_name || "Unknown Car",
             plate: "—",
             customer: booking.guest_name || "Guest",
@@ -35,156 +37,131 @@ export function OrderList() {
             startDate: booking.pickup_date || "—",
             endDate: booking.return_date || "—",
             status: booking.status || "pending",
-            statusColor:
-                booking.status === "confirmed"
-                    ? "bg-green-500"
-                    : booking.status === "pending"
-                        ? "bg-yellow-500"
-                        : booking.status === "completed"
-                            ? "bg-blue-500"
-                            : "bg-gray-400",
             avatar: null,
             carImage: matchedCar?.img || null,
         };
     });
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 4;
+    const itemsPerPage = 3;
     const totalPages = Math.ceil(realOrders.length / itemsPerPage);
     const paginatedOrders = realOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
+    const getStatusVariant = (status: string) => {
+        switch (status) {
+            case "confirmed": return "default";
+            case "pending": return "secondary";
+            case "completed": return "outline";
+            default: return "outline";
+        }
+    };
+
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full">
-            {/* Header */}
-            <div className="p-6 flex items-center justify-between border-b border-gray-100">
-                <h2 className="text-lg font-normal text-gray-900">Order</h2>
-                <button className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-                    View All &gt;
-                </button>
-            </div>
-
-            {/* Order Items */}
-            {bookingsLoading ? (
-                <div className="p-12 text-center flex-1">
-                    <p className="text-gray-400 text-sm">Loading orders...</p>
-                </div>
-            ) : realOrders.length === 0 ? (
-                <div className="p-12 text-center flex-1">
-                    <p className="text-gray-400 text-sm">No recent orders found.</p>
-                </div>
-            ) : (
-                <div className="flex-1 flex flex-col justify-between">
-                    <div className="divide-y divide-gray-100">
-                        {paginatedOrders.map((order) => (
-                            <div key={order.id} className="p-6">
-                                {/* Status Badge & ID */}
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="flex items-start gap-3">
-                                        {order.carImage ? (
-                                            <div className="w-12 h-10 relative bg-slate-100 rounded overflow-hidden flex-shrink-0 border border-slate-200">
+        <Card className="h-full flex flex-col">
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+                <CardTitle className="text-lg font-semibold">Orders</CardTitle>
+                <Button variant="ghost" size="sm" className="text-xs h-8 gap-1">
+                    View All <ChevronRight className="h-3 w-3" />
+                </Button>
+            </CardHeader>
+            <CardContent className="flex-1 p-0 overflow-hidden">
+                {bookingsLoading ? (
+                    <div className="p-12 text-center text-muted-foreground text-sm">Loading orders...</div>
+                ) : realOrders.length === 0 ? (
+                    <div className="p-12 text-center text-muted-foreground text-sm">No recent orders found.</div>
+                ) : (
+                    <div className="flex flex-col h-full">
+                        <div className="divide-y">
+                            {paginatedOrders.map((order) => (
+                                <div key={order.id} className="p-4 hover:bg-accent/50 transition-colors">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="relative h-10 w-12 rounded bg-muted overflow-hidden border">
+                                            {order.carImage ? (
                                                 <Image src={order.carImage} alt={order.vehicle} fill className="object-cover" />
-                                            </div>
-                                        ) : (
-                                            <div className="w-12 h-10 bg-slate-100 rounded flex-shrink-0 flex items-center justify-center border border-slate-200 text-slate-400">
-                                                <span className="text-xs">No Img</span>
-                                            </div>
-                                        )}
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm font-semibold text-gray-900">{order.id}</span>
-                                                <span
-                                                    className={`${order.statusColor} text-white text-[10px] uppercase px-2 py-0.5 rounded-full font-medium tracking-wide`}
-                                                >
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">No Img</div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <span className="text-xs font-bold font-mono text-muted-foreground">{order.id}</span>
+                                                <Badge variant={getStatusVariant(order.status) as any} className="text-[10px] h-4 px-1.5 uppercase font-bold">
                                                     {order.status}
-                                                </span>
+                                                </Badge>
                                             </div>
-                                            <p className="text-sm font-medium text-gray-700">{order.vehicle}</p>
+                                            <p className="text-sm font-semibold truncate">{order.vehicle}</p>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Customer Info */}
-                                <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-100">
-                                    {order.avatar ? (
-                                        <Image
-                                            src={order.avatar}
-                                            alt={order.customer}
-                                            width={32}
-                                            height={32}
-                                            className="w-8 h-8 rounded-full object-cover bg-gray-200"
-                                        />
-                                    ) : (
-                                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                            <User className="w-4 h-4 text-gray-500" />
-                                        </div>
-                                    )}
-                                    <div className="flex-1 min-w-0 text-xs text-gray-600 space-y-0.5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-gray-400">👤</span>
-                                            <span className="truncate">{order.customer}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Phone className="w-3 h-3 text-gray-400" />
-                                            <span className="truncate">{order.phone}</span>
+                                    <div className="flex items-center gap-3 mb-3 p-2 rounded-md bg-muted/30 border border-transparent">
+                                        <Avatar className="h-8 w-8 border">
+                                            <AvatarFallback className="text-xs bg-background text-muted-foreground">
+                                                <User className="h-4 w-4" />
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-bold truncate">{order.customer}</p>
+                                            <p className="text-[10px] text-muted-foreground truncate">{order.phone}</p>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Dates */}
-                                <div className="grid grid-cols-2 gap-3 text-xs">
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-1.5 text-gray-400">
-                                            <Calendar className="w-3 h-3" />
-                                            <span className="text-[10px]">Start Date</span>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                                <Calendar className="h-3 w-3" />
+                                                Start
+                                            </div>
+                                            <p className="text-xs font-semibold">{new Date(order.startDate).toLocaleDateString()}</p>
                                         </div>
-                                        <p className="text-gray-900">{order.startDate}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-1.5 text-gray-400">
-                                            <Calendar className="w-3 h-3" />
-                                            <span className="text-[10px]">End Date</span>
+                                        <div className="space-y-1 text-right">
+                                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider justify-end">
+                                                <Calendar className="h-3 w-3" />
+                                                End
+                                            </div>
+                                            <p className="text-xs font-semibold">{new Date(order.endDate).toLocaleDateString()}</p>
                                         </div>
-                                        <p className="text-gray-900">{order.endDate}</p>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50">
-                            <span className="text-xs text-gray-500">
-                                Page {currentPage} of {totalPages}
-                            </span>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                                    disabled={currentPage === 1}
-                                    className="px-3 py-1 text-xs border bg-white rounded-md disabled:opacity-50"
-                                >
-                                    Prev
-                                </button>
-                                <button
-                                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                                    disabled={currentPage === totalPages}
-                                    className="px-3 py-1 text-xs border bg-white rounded-md disabled:opacity-50"
-                                >
-                                    Next
-                                </button>
-                            </div>
+                            ))}
                         </div>
-                    )}
+                    </div>
+                )}
+            </CardContent>
+            <CardFooter className="flex flex-col p-0 border-t mt-auto">
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-4 py-3 w-full bg-muted/20">
+                        <span className="text-[10px] text-muted-foreground font-medium">Page {currentPage} of {totalPages}</span>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                            >
+                                <ChevronLeft className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                            >
+                                <ChevronRight className="h-3.5 w-3.5" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+                {/* Ongoing/Next 5 Days Footer */}
+                <div className="p-4 w-full bg-muted/10">
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ongoing</h3>
+                        <span className="text-[10px] text-muted-foreground">Next 5 Days</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground text-center py-2 italic font-medium">No upcoming orders</p>
                 </div>
-            )}
-
-            {/* Next 5 Days Section */}
-            <div className="p-6 bg-gray-50 rounded-b-2xl">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-gray-700">Ongoing</h3>
-                    <span className="text-xs text-gray-500">Next 5 Days</span>
-                </div>
-                <p className="text-xs text-gray-400 text-center py-4">No upcoming orders</p>
-            </div>
-        </div>
+            </CardFooter>
+        </Card>
     );
 }

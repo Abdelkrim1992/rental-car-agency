@@ -6,7 +6,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { initAuth } from "@/store/slices/authSlice";
 import { fetchBookings } from "@/store/slices/bookingSlice";
 import { fetchMessages } from "@/store/slices/messagesSlice";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { Header } from "@/components/dashboard/Header";
 import { RealtimeNotifications } from "@/components/dashboard/RealtimeNotifications";
 
@@ -18,7 +19,6 @@ export default function DashboardLayout({
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { user, initialized } = useAppSelector((s) => s.auth);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Initialize auth
     useEffect(() => {
@@ -53,24 +53,17 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <SidebarProvider>
             <RealtimeNotifications />
-
-            {/* Sidebar */}
-            <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
-
-            {/* Main Content */}
-            <div className="lg:pl-64 flex flex-col min-h-screen">
-                {/* Header */}
-                <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-
-                {/* Page Content */}
+            <AppSidebar />
+            <SidebarInset className="flex flex-col min-h-screen">
+                <Header />
                 <main className="flex-1 p-4 lg:p-6">
                     <div className="max-w-[1920px] mx-auto">
                         {children}
                     </div>
                 </main>
-            </div>
-        </div>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }

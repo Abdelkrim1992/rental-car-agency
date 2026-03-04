@@ -44,6 +44,7 @@ function BookingContent() {
 
         try {
             await dispatch(createBooking({
+                car_id: car.id,
                 car_name: car.name,
                 pickup_date: form.pickupDate,
                 return_date: form.returnDate,
@@ -194,7 +195,7 @@ function BookingContent() {
 export default function BookingPage() {
     return (
         <div className="min-h-screen bg-[#fafafa] font-['Inter',sans-serif]">
-            <Navbar />
+            <Navbar variant="transparent" />
             <Suspense fallback={<div className="flex items-center justify-center py-24"><p className="text-gray-400">Loading...</p></div>}>
                 <BookingContent />
             </Suspense>
