@@ -4,11 +4,18 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { updateBooking, deleteBooking } from "@/store/slices/bookingSlice";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Trash2, Save } from "lucide-react";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    CardFooter,
+    Button,
+    Input,
+    Select,
+    SelectItem,
+    Divider
+} from "@heroui/react";
+import { ArrowLeft, Trash2, Save, User, Phone, Mail, Calendar, DollarSign } from "lucide-react";
 
 export default function EditBookingPage() {
     const params = useParams();
@@ -50,25 +57,28 @@ export default function EditBookingPage() {
 
     if (!booking) {
         return (
-            <div className="p-10 text-center space-y-4">
-                <p className="text-slate-500">Booking not found.</p>
-                <Button variant="outline" onClick={() => router.push("/dashboard/bookings")}>Go Back</Button>
+            <div className="py-16 text-center space-y-4">
+                <div className="p-4 bg-warning-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto text-warning">
+                    <Calendar className="size-8" />
+                </div>
+                <h2 className="text-xl font-bold">Record Not Found</h2>
+                <p className="text-small text-default-400">The requested reservation is no longer available.</p>
+                <Button variant="flat" onPress={() => router.push("/dashboard/bookings")}>
+                    Back to Bookings
+                </Button>
             </div>
         );
     }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+    const handleChange = (name: string, value: string | number) => {
+        setForm({ ...form, [name]: value });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const updates = {
-                ...form,
-                total_price: Number(form.total_price)
-            };
+            const updates = { ...form, total_price: Number(form.total_price) };
             await dispatch(updateBooking({ id: bookingId, updates })).unwrap();
             router.push(`/dashboard/bookings`);
         } catch (error) {
@@ -94,81 +104,140 @@ export default function EditBookingPage() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
-            <div className="flex items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={() => router.back()}>
-                        <ArrowLeft className="w-5 h-5" />
+                    <Button isIconOnly variant="flat" radius="full" onPress={() => router.back()}>
+                        <ArrowLeft size={18} />
                     </Button>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Edit Booking</h1>
-                        <p className="text-sm text-slate-500">#{bookingId.slice(0, 5)} - {booking.car_name}</p>
+                        <h1 className="text-2xl font-bold">Edit Booking</h1>
+                        <p className="text-small text-default-500">ID: {bookingId.slice(0, 8)}</p>
                     </div>
                 </div>
-                <Button variant="destructive" className="gap-2 shrink-0" onClick={handleDelete} disabled={deleting}>
-                    <Trash2 className="w-4 h-4" /> {deleting ? "Deleting..." : "Delete"}
+                <Button
+                    color="danger"
+                    variant="flat"
+                    onPress={handleDelete}
+                    isLoading={deleting}
+                    startContent={!deleting && <Trash2 size={16} />}
+                >
+                    Delete Booking
                 </Button>
             </div>
 
             <form onSubmit={handleSubmit}>
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Update Details</CardTitle>
-                        <CardDescription>Modify customer info, dates, and status override.</CardDescription>
+                    <CardHeader className="pb-2">
+                        <div>
+                            <p className="text-large font-bold">Booking Details</p>
+                            <p className="text-small text-default-500">Modify reservation information</p>
+                        </div>
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Status</Label>
-                                <select
-                                    name="status"
-                                    value={form.status}
-                                    onChange={handleChange}
-                                    className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="total_price">Total Price ($)</Label>
-                                <Input id="total_price" name="total_price" type="number" required value={form.total_price} onChange={handleChange} />
-                            </div>
+                    <Divider />
+                    <CardBody className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Select
+                                label="Status"
+                                labelPlacement="outside"
+                                size="lg"
+                                variant="flat"
+                                selectedKeys={[form.status]}
+                                onSelectionChange={(keys) => handleChange("status", Array.from(keys)[0] as string)}
+                            >
+                                <SelectItem key="pending">Pending</SelectItem>
+                                <SelectItem key="confirmed">Confirmed</SelectItem>
+                                <SelectItem key="completed">Completed</SelectItem>
+                                <SelectItem key="cancelled">Cancelled</SelectItem>
+                            </Select>
+                            <Input
+                                label="Total Price"
+                                labelPlacement="outside"
+                                type="number"
+                                placeholder="0"
+                                size="lg"
+                                variant="flat"
+                                required
+                                value={form.total_price.toString()}
+                                onValueChange={(val) => handleChange("total_price", parseInt(val) || 0)}
+                                startContent={<DollarSign size={16} className="text-default-400" />}
+                            />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="guest_name">Customer Name</Label>
-                                <Input id="guest_name" name="guest_name" required value={form.guest_name} onChange={handleChange} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="guest_phone">Phone</Label>
-                                <Input id="guest_phone" name="guest_phone" value={form.guest_phone || ""} onChange={handleChange} />
-                            </div>
+                        <Divider />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Input
+                                label="Customer Name"
+                                labelPlacement="outside"
+                                placeholder="Full Name"
+                                size="lg"
+                                variant="flat"
+                                required
+                                value={form.guest_name}
+                                onValueChange={(val) => handleChange("guest_name", val)}
+                                startContent={<User size={16} className="text-default-400" />}
+                            />
+                            <Input
+                                label="Phone"
+                                labelPlacement="outside"
+                                placeholder="Phone Number"
+                                size="lg"
+                                variant="flat"
+                                value={form.guest_phone || ""}
+                                onValueChange={(val) => handleChange("guest_phone", val)}
+                                startContent={<Phone size={16} className="text-default-400" />}
+                            />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="guest_email">Email</Label>
-                            <Input id="guest_email" name="guest_email" type="email" value={form.guest_email || ""} onChange={handleChange} />
-                        </div>
+                        <Input
+                            label="Email"
+                            labelPlacement="outside"
+                            placeholder="customer@email.com"
+                            type="email"
+                            size="lg"
+                            variant="flat"
+                            value={form.guest_email || ""}
+                            onValueChange={(val) => handleChange("guest_email", val)}
+                            startContent={<Mail size={16} className="text-default-400" />}
+                        />
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="pickup_date">Pickup Date</Label>
-                                <Input id="pickup_date" name="pickup_date" type="date" required value={form.pickup_date} onChange={handleChange} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="return_date">Return Date</Label>
-                                <Input id="return_date" name="return_date" type="date" required value={form.return_date} onChange={handleChange} />
-                            </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Input
+                                label="Pickup Date"
+                                labelPlacement="outside"
+                                type="date"
+                                size="lg"
+                                variant="flat"
+                                required
+                                value={form.pickup_date}
+                                onValueChange={(val) => handleChange("pickup_date", val)}
+                                startContent={<Calendar size={16} className="text-default-400" />}
+                            />
+                            <Input
+                                label="Return Date"
+                                labelPlacement="outside"
+                                type="date"
+                                size="lg"
+                                variant="flat"
+                                required
+                                value={form.return_date}
+                                onValueChange={(val) => handleChange("return_date", val)}
+                                startContent={<Calendar size={16} className="text-default-400" />}
+                            />
                         </div>
-                    </CardContent>
-                    <CardFooter className="bg-slate-50 border-t py-4 flex justify-end gap-3">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
-                        <Button type="submit" className="bg-slate-900 text-white gap-2" disabled={loading}>
-                            {loading ? "Saving..." : <><Save className="w-4 h-4" /> Save Changes</>}
+                    </CardBody>
+                    <CardFooter className="flex justify-between items-center border-t border-default-100">
+                        <Button variant="light" onPress={() => router.back()}>
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            color="primary"
+                            isLoading={loading}
+                            endContent={!loading && <Save size={16} />}
+                        >
+                            Save Changes
                         </Button>
                     </CardFooter>
                 </Card>

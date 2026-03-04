@@ -1,16 +1,26 @@
+"use client";
+
 import Image from "next/image";
 import { useState } from "react";
-import { Calendar, Phone, User, ChevronRight, ChevronLeft } from "lucide-react";
+import { Calendar, Package, ChevronRight } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    CardFooter,
+    Avatar,
+    Button,
+    Divider,
+    Pagination,
+    Chip,
+    Skeleton
+} from "@heroui/react";
 import Link from "next/link";
 
 interface OrderEntry {
     id: string;
+    realId: string | undefined;
     vehicle: string;
     plate: string;
     customer: string;
@@ -49,123 +59,111 @@ export function OrderList() {
     const totalPages = Math.ceil(realOrders.length / itemsPerPage);
     const paginatedOrders = realOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    const getStatusVariant = (status: string) => {
+    const getStatusColor = (status: string): "default" | "primary" | "secondary" | "success" | "warning" | "danger" => {
         switch (status) {
-            case "confirmed": return "default";
-            case "pending": return "secondary";
-            case "completed": return "outline";
-            default: return "outline";
+            case "confirmed": return "success";
+            case "pending": return "warning";
+            case "completed": return "primary";
+            case "cancelled": return "danger";
+            default: return "default";
         }
     };
 
     return (
-        <Card className="h-full flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between pb-4">
-                <CardTitle className="text-lg font-semibold">Orders</CardTitle>
-                <Button variant="ghost" size="sm" className="text-xs h-8 gap-1">
-                    View All <ChevronRight className="h-3 w-3" />
+        <Card className="h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div>
+                    <p className="text-large font-bold">Recent Orders</p>
+                    <p className="text-small text-default-500">All booking activity</p>
+                </div>
+                <Button
+                    variant="flat"
+                    size="sm"
+                    as={Link}
+                    href="/dashboard/bookings"
+                    endContent={<ChevronRight size={14} />}
+                >
+                    View All
                 </Button>
             </CardHeader>
-            <CardContent className="flex-1 p-0 overflow-hidden">
+            <CardBody className="py-2">
                 {bookingsLoading ? (
-                    <div className="p-12 text-center text-muted-foreground text-sm">Loading orders...</div>
+                    <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="flex gap-4 items-center">
+                                <Skeleton className="rounded-lg w-16 h-12" />
+                                <div className="flex-1 space-y-2">
+                                    <Skeleton className="h-3 w-1/2 rounded-full" />
+                                    <Skeleton className="h-3 w-3/4 rounded-full" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 ) : realOrders.length === 0 ? (
-                    <div className="p-12 text-center text-muted-foreground text-sm">No recent orders found.</div>
+                    <div className="py-12 flex flex-col items-center justify-center gap-2 text-default-400">
+                        <Package size={32} />
+                        <p className="text-small">No orders found</p>
+                    </div>
                 ) : (
-                    <div className="flex flex-col h-full">
-                        <div className="divide-y">
-                            {paginatedOrders.map((order) => (
-                                <div key={order.id} className="p-4 hover:bg-accent/50 transition-colors">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="relative h-10 w-12 rounded bg-muted overflow-hidden border">
-                                            {order.carImage ? (
-                                                <Image src={order.carImage} alt={order.vehicle} fill className="object-cover" />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center text-[10px] text-muted-foreground">No Img</div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-0.5">
-                                                <span className="text-xs font-bold font-mono text-muted-foreground">{order.id}</span>
-                                                <Badge variant={getStatusVariant(order.status) as any} className="text-[10px] h-4 px-1.5 uppercase font-bold">
-                                                    {order.status}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-sm font-semibold truncate">{order.vehicle}</p>
-                                        </div>
+                    <div className="flex flex-col gap-4">
+                        {paginatedOrders.map((order) => (
+                            <div key={order.id} className="flex flex-col gap-3 p-3 rounded-xl border border-default-100 hover:bg-default-50">
+                                <div className="flex items-center gap-4">
+                                    <div className="relative h-12 w-16 shrink-0 rounded-lg bg-default-100 overflow-hidden">
+                                        {order.carImage ? (
+                                            <Image src={order.carImage} alt={order.vehicle} fill className="object-cover" />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-[10px] text-default-400">N/A</div>
+                                        )}
                                     </div>
-
-                                    <div className="flex items-center gap-3 mb-3 p-2 rounded-md bg-muted/30 border border-transparent">
-                                        <Avatar className="h-8 w-8 border">
-                                            <AvatarFallback className="text-xs bg-background text-muted-foreground">
-                                                <User className="h-4 w-4" />
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1 min-w-0">
-                                            <Link href={`/dashboard/bookings/${order.realId}`} className="text-xs font-bold truncate hover:text-primary transition-colors cursor-pointer">
-                                                {order.customer}
-                                            </Link>
-                                            <p className="text-[10px] text-muted-foreground truncate">{order.phone}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-tiny font-mono text-default-400">{order.id}</p>
+                                            <Chip
+                                                size="sm"
+                                                variant="flat"
+                                                color={getStatusColor(order.status)}
+                                                className="h-4 text-[9px] uppercase font-bold"
+                                            >
+                                                {order.status}
+                                            </Chip>
                                         </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                                                <Calendar className="h-3 w-3" />
-                                                Start
-                                            </div>
-                                            <p className="text-xs font-semibold">{new Date(order.startDate).toLocaleDateString()}</p>
-                                        </div>
-                                        <div className="space-y-1 text-right">
-                                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium uppercase tracking-wider justify-end">
-                                                <Calendar className="h-3 w-3" />
-                                                End
-                                            </div>
-                                            <p className="text-xs font-semibold">{new Date(order.endDate).toLocaleDateString()}</p>
-                                        </div>
+                                        <p className="text-sm font-semibold truncate hover:text-primary transition-colors cursor-pointer">{order.vehicle}</p>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Avatar
+                                            name={order.customer}
+                                            src={order.avatar || undefined}
+                                            size="sm"
+                                            className="w-6 h-6"
+                                        />
+                                        <p className="text-tiny font-medium text-default-600">{order.customer}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-tiny text-default-400">
+                                        <Calendar size={12} className="text-primary" />
+                                        {new Date(order.startDate).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
-            </CardContent>
-            <CardFooter className="flex flex-col p-0 border-t mt-auto">
-                {totalPages > 1 && (
-                    <div className="flex items-center justify-between px-4 py-3 w-full bg-muted/20">
-                        <span className="text-[10px] text-muted-foreground font-medium">Page {currentPage} of {totalPages}</span>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                                disabled={currentPage === 1}
-                            >
-                                <ChevronLeft className="h-3.5 w-3.5" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                                disabled={currentPage === totalPages}
-                            >
-                                <ChevronRight className="h-3.5 w-3.5" />
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {/* Ongoing/Next 5 Days Footer */}
-                <div className="p-4 w-full bg-muted/10">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ongoing</h3>
-                        <span className="text-[10px] text-muted-foreground">Next 5 Days</span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground text-center py-2 italic font-medium">No upcoming orders</p>
-                </div>
-            </CardFooter>
+            </CardBody>
+            {totalPages > 1 && (
+                <CardFooter className="justify-center border-t border-default-100">
+                    <Pagination
+                        total={totalPages}
+                        page={currentPage}
+                        onChange={setCurrentPage}
+                        size="sm"
+                        radius="full"
+                        variant="flat"
+                        showControls
+                    />
+                </CardFooter>
+            )}
         </Card>
     );
 }

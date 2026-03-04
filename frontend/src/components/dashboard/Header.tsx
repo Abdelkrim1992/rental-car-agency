@@ -1,32 +1,24 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Bell, MessageSquare, Car } from "lucide-react";
-import Image from "next/image";
+import { Bell, MessageSquare, Car, Menu, Settings, LogOut } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { markMessageRead } from "@/store/slices/messagesSlice";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
+    Dropdown,
+    DropdownTrigger,
     DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
+    DropdownItem,
+    DropdownSection,
+    Avatar,
+    Button,
+    Badge,
+    Breadcrumbs,
+    BreadcrumbItem,
+    Divider,
+    ScrollShadow
+} from "@heroui/react";
 
 export function Header() {
     const dispatch = useAppDispatch();
@@ -79,135 +71,114 @@ export function Header() {
     };
 
     return (
-        <header className="h-16 bg-background border-b sticky top-0 z-30 w-full">
-            <div className="h-full px-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <SidebarTrigger className="-ml-1" />
-                    <Separator orientation="vertical" className="mr-2 h-4" />
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbLink asChild>
-                                    <Link href="/dashboard">Dashboard</Link>
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator className="hidden md:block" />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage>Overview</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
-                </div>
+        <header className="h-16 bg-background border-b sticky top-0 z-30 w-full px-6 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+                <Breadcrumbs variant="light">
+                    <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
+                    <BreadcrumbItem href="/dashboard">Overview</BreadcrumbItem>
+                </Breadcrumbs>
+            </div>
 
-                <div className="flex items-center gap-2">
-                    {/* Notifications Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full">
-                                <Bell className="h-4 w-4" />
-                                {unreadNotifications.length > 0 && (
-                                    <span className="absolute top-2 right-2 flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive"></span>
-                                    </span>
-                                )}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[320px] p-0">
-                            <DropdownMenuLabel className="p-4 flex items-center justify-between">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-semibold">Notifications</span>
-                                    <span className="text-xs font-normal text-muted-foreground">
-                                        {unreadNotifications.length > 0
-                                            ? `You have ${unreadNotifications.length} unread alerts`
-                                            : "No new notifications"}
-                                    </span>
-                                </div>
-                                {unreadNotifications.length > 0 && (
-                                    <Button variant="ghost" className="h-auto p-0 text-xs font-semibold text-primary hover:bg-transparent" onClick={handleMarkAllRead}>
-                                        Mark all as read
-                                    </Button>
-                                )}
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <div className="max-h-[300px] overflow-y-auto">
-                                {displayList.length === 0 ? (
-                                    <div className="p-8 text-center flex flex-col items-center justify-center gap-1">
-                                        <Bell className="h-8 w-8 text-muted-foreground/20 mb-2" />
-                                        <p className="text-sm font-medium">Nothing yet!</p>
-                                        <p className="text-xs text-muted-foreground">Any updates will appear here.</p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col">
-                                        {displayList.map((n) => (
-                                            <DropdownMenuItem key={`${n.type}-${n.id}`} asChild>
-                                                <Link
-                                                    href={n.link}
-                                                    className={cn(
-                                                        "flex gap-4 p-4 cursor-pointer focus:bg-accent",
-                                                        n.isNew && "bg-accent/40"
-                                                    )}
-                                                >
-                                                    <div className={cn(
-                                                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-sm",
-                                                        n.type === 'booking' ? 'bg-indigo-600 text-white' : 'bg-amber-500 text-white'
-                                                    )}>
-                                                        {n.type === 'booking' ? <Car className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
-                                                    </div>
-                                                    <div className="flex flex-col gap-1 overflow-hidden">
-                                                        <div className="flex justify-between items-center gap-2">
-                                                            <p className="text-xs font-semibold truncate">{n.title}</p>
-                                                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                                                                {new Date(n.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-[11px] text-muted-foreground line-clamp-2 leading-tight">
-                                                            {n.description}
-                                                        </p>
-                                                    </div>
-                                                </Link>
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <DropdownMenuSeparator />
-                            <div className="p-2">
-                                <Button variant="ghost" className="w-full h-8 text-xs font-bold uppercase tracking-widest" asChild>
-                                    <Link href="/dashboard/messages">View Activity Log</Link>
-                                </Button>
-                            </div>
-                        </DropdownMenuContent>
+            <div className="flex items-center gap-4">
+                {/* Notifications */}
+                <Dropdown placement="bottom-end">
+                    <DropdownTrigger>
+                        <Button
+                            isIconOnly
+                            variant="light"
+                            radius="full"
+                            className="text-foreground-500 hover:text-foreground"
+                        >
+                            <Badge
+                                content={unreadNotifications.length}
+                                color="danger"
+                                shape="circle"
+                                size="sm"
+                                isInvisible={unreadNotifications.length === 0}
+                            >
+                                <Bell className="size-5" />
+                            </Badge>
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                        aria-label="Notifications"
+                        className="p-0 min-w-[320px]"
+                        variant="flat"
+                    >
+                        <DropdownSection
+                            title="Notifications"
+                        >
+                            {displayList.length === 0 ? (
+                                <DropdownItem key="empty" className="h-24 text-center pointer-events-none">
+                                    <p className="text-foreground-400">No notifications</p>
+                                </DropdownItem>
+                            ) : (
+                                displayList.map((n) => (
+                                    <DropdownItem
+                                        key={`${n.type}-${n.id}`}
+                                        className={`px-4 py-3 border-b last:border-0 ${n.isNew ? "bg-primary-50" : ""}`}
+                                        textValue={n.title}
+                                    >
+                                        <Link href={n.link} className="flex gap-4 w-full">
+                                            <div className="p-2 rounded-lg bg-default-100">
+                                                {n.type === 'booking' ? <Car className="size-4" /> : <MessageSquare className="size-4" />}
+                                            </div>
+                                            <div className="flex flex-col flex-1">
+                                                <div className="flex justify-between items-center gap-2">
+                                                    <span className="text-xs font-semibold">{n.title}</span>
+                                                    <span className="text-[10px] text-foreground-400">
+                                                        {new Date(n.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[11px] text-foreground-500 line-clamp-2">
+                                                    {n.description}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    </DropdownItem>
+                                ))
+                            )}
+                        </DropdownSection>
                     </DropdownMenu>
+                </Dropdown>
 
-                    {/* User Profile */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="flex items-center gap-3 h-9 px-2 hover:bg-accent rounded-full">
-                                <div className="text-right hidden sm:block">
-                                    <p className="text-xs font-bold leading-none">
-                                        {user?.full_name || "Admin"}
-                                    </p>
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-tighter font-bold">Administrator</p>
-                                </div>
-                                <Avatar className="h-8 w-8">
-                                    <AvatarImage src="/images/dashboard/admin-avatar.png" alt="Admin" />
-                                    <AvatarFallback>{user?.full_name?.charAt(0) || "A"}</AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                                <Link href="/dashboard/settings">Settings</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive focus:text-destructive">
-                                Log out
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
+                <Divider orientation="vertical" className="h-6" />
+
+                {/* User Profile */}
+                <Dropdown placement="bottom-end">
+                    <DropdownTrigger>
+                        <Button
+                            variant="light"
+                            className="flex items-center gap-3 px-2 py-4 rounded-xl"
+                        >
+                            <div className="flex flex-col items-end text-right">
+                                <span className="text-sm font-semibold text-foreground leading-none">
+                                    {user?.full_name || "Admin"}
+                                </span>
+                                <span className="text-[10px] text-foreground-400 font-bold uppercase">
+                                    Administrator
+                                </span>
+                            </div>
+                            <Avatar
+                                name={user?.full_name || "Admin"}
+                                size="sm"
+                                color="primary"
+                            />
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu aria-label="Profile Menu">
+                        <DropdownItem key="profile" showDivider className="h-14 gap-2">
+                            <p className="font-semibold">Signed in as</p>
+                            <p className="font-semibold text-primary">{user?.email || "admin@renture.com"}</p>
+                        </DropdownItem>
+                        <DropdownItem key="settings" as={Link} href="/dashboard/settings">
+                            Settings
+                        </DropdownItem>
+                        <DropdownItem key="logout" color="danger" className="text-danger">
+                            Log Out
+                        </DropdownItem>
                     </DropdownMenu>
-                </div>
+                </Dropdown>
             </div>
         </header>
     );

@@ -5,10 +5,18 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchBookings } from "@/store/slices/bookingSlice";
 import { Navbar } from "@/components/Navbar";
 import { FooterSection as Footer } from "@/components/FooterSection";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, CarIcon, Clock } from "lucide-react";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    Button,
+    Chip,
+    Divider,
+    Pagination,
+    Skeleton,
+    Image as HeroImage
+} from "@heroui/react";
+import { Calendar, MapPin, CarIcon, Clock, ShieldCheck, User } from "lucide-react";
 import Image from "next/image";
 
 export default function MyBookingsPage() {
@@ -33,95 +41,108 @@ export default function MyBookingsPage() {
     );
 
     return (
-        <main className="min-h-screen bg-slate-50 font-['Inter'] flex flex-col">
+        <main className="min-h-screen bg-white flex flex-col">
             <Navbar variant="transparent" />
 
-            <div className="flex-1 py-16 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto w-full space-y-8 mt-10">
-                <div className="space-y-2 text-center">
-                    <h1 className="text-4xl font-bold tracking-tight text-slate-900">Confirmed Bookings</h1>
-                    <p className="text-slate-500 max-w-2xl mx-auto">
-                        Track upcoming public fleet reservations. If your booking was accepted by an administrator, it will appear here.
+            <div className="flex-1 py-16 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto w-full space-y-12 mt-16">
+                <div className="space-y-4 text-center">
+                    <h1 className="text-6xl font-black tracking-tighter text-gray-900 uppercase">Registry</h1>
+                    <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-xs max-w-2xl mx-auto leading-loose">
+                        Manifest of active fleet deployments. Authenticated reservations confirmed by oversight.
                     </p>
+                    <div className="flex justify-center pt-4">
+                        <div className="h-1 w-20 bg-gray-900 rounded-full" />
+                    </div>
                 </div>
 
                 {loading ? (
-                    <div className="py-20 flex flex-col items-center justify-center gap-4">
-                        <div className="w-8 h-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                        <span className="text-sm text-slate-500">Syncing live reservations...</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[1, 2, 3].map((i) => (
+                            <Card key={i} className="rounded-[2.5rem] shadow-none border border-gray-100 p-2">
+                                <Skeleton className="rounded-[2rem] aspect-video" />
+                                <div className="p-6 space-y-3">
+                                    <Skeleton className="w-3/4 h-6 rounded-lg" />
+                                    <Skeleton className="w-1/2 h-4 rounded-lg" />
+                                </div>
+                            </Card>
+                        ))}
                     </div>
                 ) : confirmedBookings.length === 0 ? (
-                    <div className="py-20 text-center">
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Clock className="w-8 h-8 text-slate-400" />
+                    <Card className="rounded-[3rem] shadow-none border border-dashed border-gray-200 bg-gray-50/30 py-32 flex flex-col items-center gap-6">
+                        <div className="p-8 bg-white rounded-full shadow-sm border border-gray-100">
+                            <Clock className="w-12 h-12 text-gray-300 animate-pulse" />
                         </div>
-                        <h3 className="text-lg font-medium text-slate-900">No Reservations Yet</h3>
-                        <p className="text-slate-500 mt-1">There are currently no confirmed bookings in the system.</p>
-                    </div>
+                        <div className="text-center space-y-2">
+                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Zero Deployments</h3>
+                            <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest">Awaiting reservation confirmation events.</p>
+                        </div>
+                    </Card>
                 ) : (
-                    <div className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="space-y-12">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                             {paginatedBookings.map((b) => (
-                                <Card key={b.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                                    <div className="h-48 bg-slate-100 relative w-full flex items-center justify-center">
+                                <Card key={b.id} className="shadow-none border border-gray-100 rounded-[2.5rem] bg-white group hover:border-gray-200 transition-all p-2">
+                                    <div className="aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-50 border border-gray-100 relative shadow-inner">
                                         {b.car_img ? (
-                                            <Image src={b.car_img} alt={b.car_name} fill className="object-cover" />
+                                            <Image src={b.car_img} alt={b.car_name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                                         ) : (
-                                            <CarIcon className="w-12 h-12 text-slate-300" />
+                                            <CarIcon className="w-16 h-16 text-gray-200 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                                         )}
-                                        <div className="absolute top-4 right-4 z-10">
-                                            <Badge className="bg-green-500 uppercase tracking-wider text-[10px] py-1 shadow-md">
-                                                Accepted
-                                            </Badge>
+                                        <div className="absolute top-6 left-6 z-10">
+                                            <Chip
+                                                variant="flat"
+                                                color="success"
+                                                className="bg-white/90 backdrop-blur-md font-black uppercase text-[8px] h-6 px-3 border border-green-100"
+                                                startContent={<ShieldCheck className="w-3 h-3" />}
+                                            >
+                                                Confirmed
+                                            </Chip>
                                         </div>
                                     </div>
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="text-xl flex items-center justify-between">
-                                            <span>{b.car_name}</span>
-                                        </CardTitle>
-                                        <CardDescription className="text-xs">
-                                            Reserved by: <span className="font-medium text-slate-700">{b.guest_name.split(' ')[0]}***</span>
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <div className="flex items-center gap-3 text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                            <Calendar className="w-4 h-4 text-slate-400" />
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Duration</span>
-                                                <span className="font-medium text-slate-800">{b.pickup_date} <span className="text-slate-400 mx-1">to</span> {b.return_date}</span>
+                                    <CardBody className="px-6 py-8 space-y-6">
+                                        <div className="space-y-1">
+                                            <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter line-clamp-1">{b.car_name}</h3>
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <User className="w-3 h-3" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest">{b.guest_name.split(' ')[0]}***</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3 text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                            <MapPin className="w-4 h-4 text-slate-400" />
-                                            <div className="flex flex-col">
-                                                <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Location</span>
-                                                <span className="font-medium text-slate-800">{b.pickup_location}</span>
+
+                                        <Divider className="opacity-50" />
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
+                                                <Calendar className="w-4 h-4 text-blue-600" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mission Hub</p>
+                                                <p className="text-xs font-black text-gray-900 uppercase tracking-tighter truncate">{b.pickup_location.split(',')[0]}</p>
+                                            </div>
+                                            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2">
+                                                <Clock className="w-4 h-4 text-orange-600" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Retrieval</p>
+                                                <p className="text-xs font-black text-gray-900 uppercase tracking-tighter">{b.pickup_date}</p>
                                             </div>
                                         </div>
-                                    </CardContent>
+                                    </CardBody>
                                 </Card>
                             ))}
                         </div>
 
                         {/* Pagination */}
                         {totalPages > 1 && (
-                            <div className="flex items-center justify-center gap-2 pt-8 border-t border-slate-200">
-                                <Button
-                                    variant="outline"
-                                    disabled={currentPage === 1}
-                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                >
-                                    Previous
-                                </Button>
-                                <span className="text-sm font-medium text-slate-600 px-4 py-2 bg-slate-100 rounded-md">
-                                    Page {currentPage} of {totalPages}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    disabled={currentPage === totalPages}
-                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                >
-                                    Next
-                                </Button>
+                            <div className="flex justify-center pt-10">
+                                <Pagination
+                                    total={totalPages}
+                                    initialPage={1}
+                                    page={currentPage}
+                                    onChange={setCurrentPage}
+                                    radius="full"
+                                    showControls
+                                    classNames={{
+                                        wrapper: "gap-2",
+                                        item: "w-10 h-10 bg-white border border-gray-100 font-bold",
+                                        cursor: "bg-black text-white font-black"
+                                    }}
+                                />
                             </div>
                         )}
                     </div>

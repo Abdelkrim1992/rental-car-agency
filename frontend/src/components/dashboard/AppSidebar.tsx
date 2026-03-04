@@ -17,32 +17,22 @@ import {
     MessageSquare,
     ChevronRight,
 } from "lucide-react"
+import {
+    Listbox,
+    ListboxItem,
+    Accordion,
+    AccordionItem,
+    Avatar,
+    Divider,
+    Button,
+    Card,
+    CardBody
+} from "@heroui/react"
 
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarRail,
-} from "@/components/ui/sidebar"
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { logoutUser } from "@/store/slices/authSlice"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar() {
     const pathname = usePathname()
     const dispatch = useAppDispatch()
     const router = useRouter()
@@ -79,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     url: "/dashboard/vehicles/all",
                     icon: Car,
                     isActive: pathname.includes("/vehicles"),
-                    items: [
+                    subItems: [
                         {
                             title: "All Vehicles",
                             url: "/dashboard/vehicles/all",
@@ -105,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     url: "/dashboard/payments",
                     icon: CreditCard,
                     isActive: pathname.includes("/payments"),
-                    items: [
+                    subItems: [
                         {
                             title: "Payment History",
                             url: "/dashboard/payments",
@@ -124,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     isActive: isActive("/dashboard/messages"),
                 },
                 {
-                    title: "Reports & Insights",
+                    title: "Reports",
                     url: "/dashboard/reports",
                     icon: BarChart2,
                     isActive: isActive("/dashboard/reports"),
@@ -146,91 +136,94 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ]
 
     return (
-        <Sidebar {...props}>
-            <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href="/">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-green-700 text-sidebar-primary-foreground">
-                                    <Leaf className="size-4" />
-                                </div>
-                                <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold text-lg">Renture</span>
-                                </div>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarHeader>
-            <SidebarContent>
+        <aside className="w-64 h-full bg-background border-r flex flex-col sticky top-0">
+            {/* Header */}
+            <div className="p-4 flex items-center gap-3">
+                <Leaf className="text-primary size-6" />
+                <span className="font-bold text-xl">Renture</span>
+            </div>
+
+            <Divider />
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto py-2 px-2">
                 {navMain.map((group) => (
-                    <SidebarGroup key={group.title}>
-                        <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenu>
-                                {group.items.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        {item.items ? (
-                                            <Collapsible defaultOpen={item.isActive} className="group/collapsible">
-                                                <CollapsibleTrigger asChild>
-                                                    <SidebarMenuButton tooltip={item.title}>
-                                                        {item.icon && <item.icon />}
-                                                        <span>{item.title}</span>
-                                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                                                    </SidebarMenuButton>
-                                                </CollapsibleTrigger>
-                                                <CollapsibleContent>
-                                                    <SidebarMenuSub>
-                                                        {item.items.map((subItem) => (
-                                                            <SidebarMenuSubItem key={subItem.title}>
-                                                                <SidebarMenuSubButton asChild isActive={pathname === subItem.url}>
-                                                                    <Link href={subItem.url}>
-                                                                        <span>{subItem.title}</span>
-                                                                    </Link>
-                                                                </SidebarMenuSubButton>
-                                                            </SidebarMenuSubItem>
-                                                        ))}
-                                                    </SidebarMenuSub>
-                                                </CollapsibleContent>
-                                            </Collapsible>
-                                        ) : (
-                                            <SidebarMenuButton asChild isActive={item.isActive} tooltip={item.title}>
-                                                <Link href={item.url}>
-                                                    {item.icon && <item.icon />}
-                                                    <span>{item.title}</span>
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        )}
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                ))}
-            </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <div className="flex items-center gap-3 px-3 py-2">
-                            <div className="flex aspect-square size-8 items-center justify-center rounded-full bg-slate-100">
-                                <User className="size-4 text-slate-600" />
-                            </div>
-                            <div className="flex flex-col gap-0.5 leading-none overflow-hidden">
-                                <span className="font-medium text-sm truncate">{user?.full_name || "Admin"}</span>
-                                <span className="text-xs text-slate-500 truncate">{user?.email || "admin@renture.com"}</span>
-                            </div>
+                    <div key={group.title} className="mb-4">
+                        <p className="px-3 mb-1 text-xs font-semibold text-foreground-400 uppercase">
+                            {group.title}
+                        </p>
+                        <div className="space-y-1">
+                            {group.items.map((item) => (
+                                <div key={item.title}>
+                                    {item.subItems ? (
+                                        <Accordion
+                                            showDivider={false}
+                                            className="px-0"
+                                            itemClasses={{
+                                                base: "py-0",
+                                                trigger: "py-2 px-3 flex items-center gap-3",
+                                                content: "pb-2 pl-10 space-y-1",
+                                            }}
+                                        >
+                                            <AccordionItem
+                                                key={item.title}
+                                                aria-label={item.title}
+                                                startContent={item.icon && <item.icon className="size-5" />}
+                                                title={item.title}
+                                            >
+                                                {item.subItems.map((subItem) => (
+                                                    <Link
+                                                        key={subItem.title}
+                                                        href={subItem.url}
+                                                        className={`block py-1 px-2 text-sm rounded ${pathname === subItem.url ? "text-primary font-medium bg-primary-50" : "text-foreground-500 hover:bg-default-100"}`}
+                                                    >
+                                                        {subItem.title}
+                                                    </Link>
+                                                ))}
+                                            </AccordionItem>
+                                        </Accordion>
+                                    ) : (
+                                        <Link
+                                            href={item.url}
+                                            className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors ${item.isActive ? "bg-primary text-primary-foreground" : "text-foreground-600 hover:bg-default-100"}`}
+                                        >
+                                            {item.icon && <item.icon className="size-5" />}
+                                            <span className="text-sm">{item.title}</span>
+                                        </Link>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton onClick={handleLogout} className="text-slate-500 hover:text-red-500 hover:bg-red-50">
-                            <LogOut className="size-4" />
-                            <span>Logout</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
-            <SidebarRail />
-        </Sidebar>
+                    </div>
+                ))}
+            </div>
+
+            <Divider />
+
+            {/* Footer */}
+            <div className="p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                    <Avatar
+                        src={(user as any)?.avatar_url}
+                        name={(user as any)?.full_name || "Admin"}
+                        color="primary"
+                    />
+                    <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-semibold truncate">{(user as any)?.full_name || "Admin User"}</span>
+                        <span className="text-xs text-foreground-400 truncate">{user?.email || "admin@renture.com"}</span>
+                    </div>
+                </div>
+                <Button
+                    fullWidth
+                    variant="light"
+                    color="danger"
+                    onPress={handleLogout}
+                    startContent={<LogOut className="size-4" />}
+                    className="justify-start"
+                >
+                    Logout
+                </Button>
+            </div>
+        </aside>
     )
 }

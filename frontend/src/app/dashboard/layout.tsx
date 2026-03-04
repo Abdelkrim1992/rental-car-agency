@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { initAuth } from "@/store/slices/authSlice";
 import { fetchBookings } from "@/store/slices/bookingSlice";
 import { fetchMessages } from "@/store/slices/messagesSlice";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { Header } from "@/components/dashboard/Header";
 import { RealtimeNotifications } from "@/components/dashboard/RealtimeNotifications";
@@ -53,17 +52,17 @@ export default function DashboardLayout({
     }
 
     return (
-        <SidebarProvider>
+        <div className="flex min-h-screen bg-gray-50 font-sans">
             <RealtimeNotifications />
             <AppSidebar />
-            <SidebarInset className="flex flex-col min-h-screen">
+            <div className="flex-1 flex flex-col min-h-screen">
                 <Header />
-                <main className="flex-1 p-4 lg:p-6">
+                <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
                     <div className="max-w-[1920px] mx-auto">
                         {children}
                     </div>
                 </main>
-            </SidebarInset>
-        </SidebarProvider>
+            </div>
+        </div>
     );
 }

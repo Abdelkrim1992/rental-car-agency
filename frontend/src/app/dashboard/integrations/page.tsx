@@ -1,65 +1,91 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Link2, Webhook, Fingerprint } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    CardFooter,
+    Button,
+    Chip,
+    Divider
+} from "@heroui/react";
+import { Link2, Webhook, Fingerprint, Globe, ShieldCheck, Zap } from "lucide-react";
+
+const integrations = [
+    {
+        name: "Stripe",
+        description: "Handle reservation deposits and subscription billing with global compliance.",
+        status: "disconnected",
+        statusLabel: "Disconnected",
+        icon: Globe,
+        detail: "Global Payout Enabled",
+        action: "Connect",
+        actionIcon: Link2,
+    },
+    {
+        name: "Resend",
+        description: "Send booking confirmations and arrival instructions via email with high deliverability.",
+        status: "active",
+        statusLabel: "Active",
+        icon: ShieldCheck,
+        detail: "Security Protocol Active",
+        action: "Configure",
+        actionIcon: Fingerprint,
+    },
+    {
+        name: "Webhooks",
+        description: "Trigger real-time updates to external ERP systems and maintain inventory parity.",
+        status: "disconnected",
+        statusLabel: "Offline",
+        icon: Zap,
+        detail: "Low Latency Target",
+        action: "Setup",
+        actionIcon: Webhook,
+    },
+];
 
 export default function IntegrationsPage() {
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Integrations</h1>
-                <p className="text-sm text-slate-500">Connect your platform with third-party tools.</p>
+            <div>
+                <h1 className="text-2xl font-bold">Integrations</h1>
+                <p className="text-small text-default-500">Connect your fleet with external services and secure ecosystems.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Stripe Integration */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex justify-between items-center text-lg">
-                            Stripe
-                            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full ring-1 ring-slate-200">Disconnected</span>
-                        </CardTitle>
-                        <CardDescription>Payment gateway for handling deposits and reservation fees securely.</CardDescription>
-                    </CardHeader>
-                    <CardFooter className="bg-slate-50 border-t flex justify-end px-6 py-3">
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <Link2 className="w-3.5 h-3.5" /> Connect Stripe
-                        </Button>
-                    </CardFooter>
-                </Card>
-
-                {/* Email/SMTP */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex justify-between items-center text-lg">
-                            Resend Email
-                            <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full ring-1 ring-green-200">Active</span>
-                        </CardTitle>
-                        <CardDescription>Automatic confirmation emails to customers when a booking is finalized.</CardDescription>
-                    </CardHeader>
-                    <CardFooter className="bg-slate-50 border-t flex justify-end px-6 py-3">
-                        <Button variant="outline" size="sm" className="gap-2 border-slate-300">
-                            <Fingerprint className="w-3.5 h-3.5" /> Configure
-                        </Button>
-                    </CardFooter>
-                </Card>
-
-                {/* Webhooks */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex justify-between items-center text-lg">
-                            Webhooks
-                            <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full ring-1 ring-slate-200">Off</span>
-                        </CardTitle>
-                        <CardDescription>Listen to live data events across apps. Sync cars with an external CRM.</CardDescription>
-                    </CardHeader>
-                    <CardFooter className="bg-slate-50 border-t flex justify-end px-6 py-3">
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <Webhook className="w-3.5 h-3.5" /> Create Hook
-                        </Button>
-                    </CardFooter>
-                </Card>
+                {integrations.map((item) => (
+                    <Card key={item.name}>
+                        <CardHeader className="flex justify-between items-start pb-2">
+                            <div>
+                                <p className="text-large font-bold">{item.name}</p>
+                                <p className="text-tiny text-default-400">{item.status === "active" ? "Communication Bridge" : "Integration"}</p>
+                            </div>
+                            <Chip
+                                variant="flat"
+                                color={item.status === "active" ? "success" : "default"}
+                                size="sm"
+                            >
+                                {item.statusLabel}
+                            </Chip>
+                        </CardHeader>
+                        <CardBody className="py-2">
+                            <p className="text-small text-default-500">{item.description}</p>
+                            <div className="mt-4 p-3 rounded-lg bg-default-100 flex items-center gap-2">
+                                <item.icon className="size-4 text-default-400" />
+                                <span className="text-tiny text-default-500">{item.detail}</span>
+                            </div>
+                        </CardBody>
+                        <CardFooter className="justify-end border-t border-default-100">
+                            <Button
+                                variant="flat"
+                                size="sm"
+                                startContent={<item.actionIcon className="size-4" />}
+                            >
+                                {item.action}
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
         </div>
     );

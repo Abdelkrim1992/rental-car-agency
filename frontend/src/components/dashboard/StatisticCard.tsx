@@ -1,15 +1,19 @@
-import { Users, ShoppingBag, DollarSign, CreditCard, Calendar, Check, TrendingUp, TrendingDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+"use client";
+
+import { Users, ShoppingBag, DollarSign, CreditCard, Calendar, TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+    Card,
+    CardBody,
+    CardHeader,
+    Button,
+    Dropdown,
+    DropdownTrigger,
     DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+    DropdownItem,
+    Divider
+} from "@heroui/react";
 
 interface StatProps {
     label: string;
@@ -20,31 +24,24 @@ interface StatProps {
     isPositive: boolean;
 }
 
-function StatItem({ label, value, change, changeLabel, icon, isPositive }: StatProps) {
+function StatItem({ label, value, change, icon, isPositive }: StatProps) {
     return (
-        <div className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+        <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-background">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-default-100 text-default-500">
                     {icon}
                 </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{label}</p>
-                    <p className="text-2xl font-bold">{value}</p>
-                    <div className="flex items-center gap-2">
-                        <div className={cn(
-                            "flex items-center gap-0.5 text-xs font-medium",
-                            isPositive ? "text-green-600" : "text-destructive"
-                        )}>
-                            {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                <div>
+                    <p className="text-small text-default-500">{label}</p>
+                    <div className="flex items-baseline gap-2">
+                        <p className="text-xl font-semibold">{value}</p>
+                        <p className={`text-tiny font-medium ${isPositive ? "text-success" : "text-danger"}`}>
                             {change}
-                        </div>
-                        <span className="text-xs text-muted-foreground">{changeLabel}</span>
+                        </p>
                     </div>
                 </div>
             </div>
-            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground">
-                See Detail
-            </Button>
+            <Button size="sm" variant="flat">Details</Button>
         </div>
     );
 }
@@ -66,7 +63,7 @@ export function StatisticCard() {
 
         const totalCustomers = new Set(activeBookings.map(b => b.guest_email || b.guest_name)).size;
         const totalIncome = activeBookings.reduce((sum, b) => sum + (Number(b.total_price) || 0), 0);
-        const totalExpenses = totalIncome * 0.4; // Using 40% overhead model
+        const totalExpenses = totalIncome * 0.4;
 
         return {
             totalCustomers,
@@ -78,35 +75,35 @@ export function StatisticCard() {
 
     const stats: StatProps[] = [
         {
-            label: "Customer",
+            label: "Total Customers",
             value: String(filteredStats.totalCustomers),
-            change: "+12%",
+            change: "+12.5%",
             changeLabel: "vs prev",
-            icon: <Users className="h-4 w-4 text-muted-foreground" />,
+            icon: <Users size={18} />,
             isPositive: true,
         },
         {
-            label: "Order",
+            label: "Total Orders",
             value: String(filteredStats.totalOrders),
-            change: "+8%",
+            change: "+8.2%",
             changeLabel: "vs prev",
-            icon: <ShoppingBag className="h-4 w-4 text-muted-foreground" />,
+            icon: <ShoppingBag size={18} />,
             isPositive: true,
         },
         {
-            label: "Income",
+            label: "Total Income",
             value: `$${filteredStats.totalIncome.toLocaleString()}`,
-            change: "+15%",
+            change: "+15.0%",
             changeLabel: "vs prev",
-            icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
+            icon: <DollarSign size={18} />,
             isPositive: true,
         },
         {
-            label: "Expenses",
+            label: "Total Expenses",
             value: `$${filteredStats.totalExpenses.toLocaleString()}`,
-            change: "-5%",
+            change: "-5.4%",
             changeLabel: "vs prev",
-            icon: <CreditCard className="h-4 w-4 text-muted-foreground" />,
+            icon: <CreditCard size={18} />,
             isPositive: false,
         },
     ];
@@ -119,36 +116,37 @@ export function StatisticCard() {
 
     return (
         <Card className="h-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <CardTitle className="text-lg font-semibold">Statistic</CardTitle>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 gap-2 text-xs">
-                            <Calendar className="h-3 w-3" />
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <p className="text-large font-bold">Statistics</p>
+                <Dropdown placement="bottom-end">
+                    <DropdownTrigger>
+                        <Button variant="flat" size="sm" endContent={<ChevronDown size={14} />}>
                             {getRangeLabel()}
                         </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setTimeRange("7_days")} className="gap-2">
-                            Past 7 days
-                            {timeRange === "7_days" && <Check className="h-3 w-3 ml-auto" />}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTimeRange("30_days")} className="gap-2">
-                            Past 30 days
-                            {timeRange === "30_days" && <Check className="h-3 w-3 ml-auto" />}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTimeRange("all_time")} className="gap-2">
-                            All time
-                            {timeRange === "all_time" && <Check className="h-3 w-3 ml-auto" />}
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                        aria-label="Time Range"
+                        disallowEmptySelection
+                        selectionMode="single"
+                        selectedKeys={[timeRange]}
+                        onSelectionChange={(keys) => setTimeRange(Array.from(keys)[0] as any)}
+                    >
+                        <DropdownItem key="7_days">Past 7 days</DropdownItem>
+                        <DropdownItem key="30_days">Past 30 days</DropdownItem>
+                        <DropdownItem key="all_time">All time</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
             </CardHeader>
-            <CardContent className="divide-y">
-                {stats.map((stat, idx) => (
-                    <StatItem key={idx} {...stat} />
-                ))}
-            </CardContent>
+            <CardBody>
+                <div className="flex flex-col gap-2">
+                    {stats.map((stat, idx) => (
+                        <div key={idx}>
+                            <StatItem {...stat} />
+                            {idx < stats.length - 1 && <Divider />}
+                        </div>
+                    ))}
+                </div>
+            </CardBody>
         </Card>
     );
 }
