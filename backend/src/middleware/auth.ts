@@ -13,18 +13,29 @@ export interface AuthRequest extends Request {
 export async function authMiddleware(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        res.status(401).json({ error: "No token provided" });
+    if (!authHeader) {
+        res.status(401).json({ error: "No token provided (Authorization header missing)" });
+        return;
+    }
+
+    if (!authHeader.toLowerCase().startsWith("bearer")) {
+        res.status(401).json({ error: "Invalid Authorization format (Expected Bearer <token>)" });
         return;
     }
 
     const token = authHeader.split(" ")[1];
+
+    if (!token || token.trim() === "") {
+        res.status(401).json({ error: "Empty token provided" });
+        return;
+    }
 
     try {
         // Use Supabase to verify the token and get the user
         const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
 
         if (error || !user) {
+            console.warn("Supabase auth error:", error?.message);
             res.status(401).json({ error: "Invalid or expired token" });
             return;
         }

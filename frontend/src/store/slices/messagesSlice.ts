@@ -37,10 +37,17 @@ export const fetchMessages = createAsyncThunk("messages/fetchMessages", async (_
     try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token || "";
+        const token = session?.access_token;
+
+        if (!token) {
+            console.warn("⚠️  fetchMessages: No session token found. Request will likely fail.");
+        }
 
         const response = await fetchWithTimeout(`${API_URL}/messages`, {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: {
+                "Authorization": `Bearer ${token || ""}`,
+                "Content-Type": "application/json"
+            }
         });
 
         if (!response.ok) throw new Error("Failed to fetch messages");

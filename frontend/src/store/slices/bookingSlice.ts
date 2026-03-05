@@ -88,10 +88,17 @@ export const fetchBookings = createAsyncThunk("booking/fetchBookings", async (_,
     try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token || "";
+        const token = session?.access_token;
+
+        if (!token) {
+            console.warn("⚠️  fetchBookings: No session token found. Backend request will likely fail with 401.");
+        }
 
         const response = await fetchWithTimeout(`${API_URL}/bookings/admin`, {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: {
+                "Authorization": `Bearer ${token || ""}`,
+                "Content-Type": "application/json"
+            }
         });
 
         if (!response.ok) throw new Error("Failed to fetch bookings");
