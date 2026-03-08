@@ -154,10 +154,10 @@ export default function AllVehiclesPage() {
                         >
                             <TableHeader>
                                 <TableColumn>Vehicle</TableColumn>
-                                <TableColumn>Type</TableColumn>
+                                <TableColumn className="hidden sm:table-cell">Type</TableColumn>
                                 <TableColumn>Status</TableColumn>
-                                <TableColumn>Location</TableColumn>
-                                <TableColumn className="text-right">Daily Rate</TableColumn>
+                                <TableColumn className="hidden md:table-cell">Location</TableColumn>
+                                <TableColumn className="text-right hidden lg:table-cell">Daily Rate</TableColumn>
                                 <TableColumn className="text-right">Actions</TableColumn>
                             </TableHeader>
                             <TableBody emptyContent={<p className="py-8 text-default-400">No vehicles in inventory.</p>}>
@@ -174,16 +174,16 @@ export default function AllVehiclesPage() {
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden sm:table-cell">
                                             <Chip variant="flat" size="sm">{car.type}</Chip>
                                         </TableCell>
                                         <TableCell>{getStatusChip(car.status)}</TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <p className="text-tiny text-default-500 flex items-center gap-1">
                                                 <MapPin size={12} /> {car.location}
                                             </p>
                                         </TableCell>
-                                        <TableCell className="text-right">
+                                        <TableCell className="text-right hidden lg:table-cell">
                                             <span className="font-semibold">{car.price} <span className="text-tiny text-default-400">/ day</span></span>
                                         </TableCell>
                                         <TableCell className="text-right">

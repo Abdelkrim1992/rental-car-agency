@@ -81,7 +81,7 @@ export function FaqSection() {
                         transition={{ duration: 0.7, delay: 0.3 }}
                         className="rounded-xl overflow-hidden h-[150px]"
                     >
-                        <img src={imgFaqImage} alt="FAQ illustration" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                        <img loading="lazy" decoding="async" src={imgFaqImage} alt="FAQ illustration" className="w-full h-full object-cover" />
                     </motion.div>
                 </div>
             </div>

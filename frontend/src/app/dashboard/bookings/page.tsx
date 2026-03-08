@@ -102,8 +102,8 @@ export default function BookingsPage() {
                             <TableColumn>Status</TableColumn>
                             <TableColumn>Customer</TableColumn>
                             <TableColumn>Vehicle / Location</TableColumn>
-                            <TableColumn>Booking Dates</TableColumn>
-                            <TableColumn className="text-right">Revenue</TableColumn>
+                            <TableColumn className="hidden sm:table-cell">Booking Dates</TableColumn>
+                            <TableColumn className="text-right hidden lg:table-cell">Revenue</TableColumn>
                             <TableColumn className="text-right">Actions</TableColumn>
                         </TableHeader>
                         <TableBody
@@ -123,15 +123,17 @@ export default function BookingsPage() {
                                         </Chip>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar name={b.guest_name} size="sm" />
-                                            <div>
-                                                <p className="text-sm font-semibold">{b.guest_name}</p>
-                                                <p className="text-tiny text-default-400 flex items-center gap-1">
-                                                    <Phone size={12} /> {b.guest_phone || "—"}
-                                                </p>
+                                        <Link href={`/dashboard/bookings/${b.id}`} className="group/customer">
+                                            <div className="flex items-center gap-3">
+                                                <Avatar name={b.guest_name} size="sm" className="group-hover/customer:ring-2 group-hover/customer:ring-primary transition-all" />
+                                                <div>
+                                                    <p className="text-sm font-semibold group-hover/customer:text-primary transition-colors">{b.guest_name}</p>
+                                                    <p className="text-tiny text-default-400 flex items-center gap-1">
+                                                        <Phone size={12} /> {b.guest_phone || "—"}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     </TableCell>
                                     <TableCell>
                                         <div>
@@ -141,13 +143,13 @@ export default function BookingsPage() {
                                             </p>
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="hidden sm:table-cell">
                                         <div className="flex flex-col gap-1">
                                             <p className="text-xs"><span className="text-default-400">From:</span> {new Date(b.pickup_date).toLocaleDateString()}</p>
                                             <p className="text-xs"><span className="text-default-400">Until:</span> {new Date(b.return_date).toLocaleDateString()}</p>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right hidden lg:table-cell">
                                         <span className="font-semibold">
                                             ${Number(b.total_price || 0).toLocaleString()}
                                         </span>

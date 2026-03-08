@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { initAuth } from "@/store/slices/authSlice";
 import { fetchBookings } from "@/store/slices/bookingSlice";
@@ -18,6 +18,8 @@ export default function DashboardLayout({
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { user, initialized } = useAppSelector((s) => s.auth);
+
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Initialize auth
     useEffect(() => {
@@ -39,6 +41,13 @@ export default function DashboardLayout({
         }
     }, [user, dispatch]);
 
+    const pathname = usePathname();
+
+    // Close sidebar on route change
+    useEffect(() => {
+        setIsSidebarOpen(false);
+    }, [pathname]);
+
     // Loading state
     if (!initialized || !user) {
         return (
@@ -54,9 +63,9 @@ export default function DashboardLayout({
     return (
         <div className="flex min-h-screen bg-gray-50 font-sans">
             <RealtimeNotifications />
-            <AppSidebar />
+            <AppSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             <div className="flex-1 flex flex-col min-h-screen">
-                <Header />
+                <Header onMenuClick={() => setIsSidebarOpen(true)} />
                 <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
                     <div className="max-w-[1920px] mx-auto">
                         {children}

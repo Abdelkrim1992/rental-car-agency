@@ -33,7 +33,7 @@ export function Navbar({ variant = "solid" }: NavbarProps) {
     };
 
     return (
-        <nav className={`${isTransparent ? "absolute top-0 left-0 right-0 z-50" : "sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100"}`}>
+        <nav className={`${isTransparent ? "absolute top-0 left-0 right-0 z-50" : "sticky top-0 z-50 bg-white border-b border-gray-100"}`}>
             <div className="flex items-center justify-between px-6 md:px-12 lg:px-16 py-5">
                 {/* Left Links */}
                 <div className="hidden md:flex items-center gap-8 lg:gap-10">

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Bell, MessageSquare, Car, Menu, Settings, LogOut } from "lucide-react";
+import { Bell, MessageSquare, Car, Menu, Settings, LogOut, ChevronRight } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { markMessageRead } from "@/store/slices/messagesSlice";
+import { logoutUser } from "@/store/slices/authSlice";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
     Dropdown,
     DropdownTrigger,
@@ -20,11 +22,21 @@ import {
     ScrollShadow
 } from "@heroui/react";
 
-export function Header() {
+interface HeaderProps {
+    onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const { user } = useAppSelector((s) => s.auth);
     const { bookings } = useAppSelector((s) => s.booking);
     const { messages } = useAppSelector((s) => s.messages);
+
+    const handleLogout = async () => {
+        await dispatch(logoutUser());
+        router.push("/auth/login");
+    };
 
     // Combine and sort notifications
     const { unreadNotifications, allNotifications } = useMemo(() => {
@@ -71,15 +83,26 @@ export function Header() {
     };
 
     return (
-        <header className="h-16 bg-background border-b sticky top-0 z-30 w-full px-6 flex items-center justify-between">
-            <div className="flex items-center gap-6">
-                <Breadcrumbs variant="light">
-                    <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
-                    <BreadcrumbItem href="/dashboard">Overview</BreadcrumbItem>
-                </Breadcrumbs>
+        <header className="h-16 bg-background border-b sticky top-0 z-30 w-full px-4 md:px-6 flex items-center justify-between">
+            <div className="flex items-center gap-2 md:gap-6">
+                <Button
+                    isIconOnly
+                    variant="light"
+                    onPress={onMenuClick}
+                    className="md:hidden"
+                >
+                    <Menu className="size-5" />
+                </Button>
+
+                <div className="hidden sm:block">
+                    <Breadcrumbs variant="light">
+                        <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
+                        <BreadcrumbItem href="/dashboard">Overview</BreadcrumbItem>
+                    </Breadcrumbs>
+                </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
                 {/* Notifications */}
                 <Dropdown placement="bottom-end">
                     <DropdownTrigger>
@@ -174,7 +197,7 @@ export function Header() {
                         <DropdownItem key="settings" as={Link} href="/dashboard/settings">
                             Settings
                         </DropdownItem>
-                        <DropdownItem key="logout" color="danger" className="text-danger">
+                        <DropdownItem key="logout" color="danger" className="text-danger" onPress={handleLogout}>
                             Log Out
                         </DropdownItem>
                     </DropdownMenu>

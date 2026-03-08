@@ -132,15 +132,15 @@ export function OrderList() {
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
+                                    <Link href={`/dashboard/bookings/${order.realId}`} className="flex items-center gap-2 group/customer">
                                         <Avatar
                                             name={order.customer}
                                             src={order.avatar || undefined}
                                             size="sm"
-                                            className="w-6 h-6"
+                                            className="w-6 h-6 group-hover/customer:ring-2 group-hover/customer:ring-primary transition-all"
                                         />
-                                        <p className="text-tiny font-medium text-default-600">{order.customer}</p>
-                                    </div>
+                                        <p className="text-tiny font-medium text-default-600 group-hover/customer:text-primary transition-colors">{order.customer}</p>
+                                    </Link>
                                     <div className="flex items-center gap-1.5 text-tiny text-default-400">
                                         <Calendar size={12} className="text-primary" />
                                         {new Date(order.startDate).toLocaleDateString()}

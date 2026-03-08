@@ -41,7 +41,7 @@ function StatItem({ label, value, change, icon, isPositive }: StatProps) {
                     </div>
                 </div>
             </div>
-            <Button size="sm" variant="flat">Details</Button>
+            <Button size="sm" variant="flat" className="hidden sm:flex">Details</Button>
         </div>
     );
 }

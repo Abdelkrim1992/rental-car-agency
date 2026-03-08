@@ -32,12 +32,30 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { logoutUser } from "@/store/slices/authSlice"
 
-export function AppSidebar() {
+import { motion, AnimatePresence } from "framer-motion"
+
+interface AppSidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export function AppSidebar({ isOpen = false, onClose }: AppSidebarProps) {
     const pathname = usePathname()
     const dispatch = useAppDispatch()
     const router = useRouter()
     const { user } = useAppSelector((s) => s.auth)
     const [isCollapsed, setIsCollapsed] = React.useState(false)
+
+    // Sync collapse state with mobile view
+    React.useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth < 768) {
+                setIsCollapsed(false);
+            }
+        };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const handleLogout = async () => {
         await dispatch(logoutUser())
@@ -136,18 +154,30 @@ export function AppSidebar() {
         },
     ]
 
-    return (
-        <aside className={`h-full bg-background border-r flex flex-col sticky top-0 transition-all duration-300 ${isCollapsed ? "w-[80px]" : "w-64"}`}>
+    const sidebarContent = (
+        <aside className={`h-full bg-background border-r flex flex-col transition-all duration-300 ${isCollapsed ? "w-[80px]" : "w-64"}`}>
             {/* Header */}
             <div className={`p-4 flex items-center relative gap-3 ${isCollapsed ? "justify-center" : ""}`}>
                 <Leaf className="text-primary size-6 shrink-0" />
                 {!isCollapsed && <span className="font-bold text-xl whitespace-nowrap overflow-hidden">Renture</span>}
+
+                {/* Desktop Collapse Toggle */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className={`absolute flex items-center justify-center bg-white border shadow-sm rounded-full size-6 text-foreground-500 hover:text-foreground transition-all z-50 ${isCollapsed ? "-right-3 top-5" : "right-2 hidden md:flex"}`}
+                    className="absolute -right-3 top-5 hidden md:flex items-center justify-center bg-white border shadow-sm rounded-full size-6 text-foreground-500 hover:text-foreground transition-all z-50"
                 >
                     <ChevronRight className={`size-4 transition-transform ${isCollapsed ? "" : "rotate-180"}`} />
                 </button>
+
+                {/* Mobile Close Button */}
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        className="md:hidden absolute right-2 top-4 p-2 text-foreground-400 hover:text-foreground"
+                    >
+                        <ChevronRight className="size-5 rotate-180" />
+                    </button>
+                )}
             </div>
 
             <Divider />
@@ -184,6 +214,7 @@ export function AppSidebar() {
                                                     <Link
                                                         key={subItem.title}
                                                         href={subItem.url}
+                                                        onClick={() => onClose?.()}
                                                         className={`block py-1 px-2 text-sm rounded whitespace-nowrap ${pathname === subItem.url ? "text-primary font-medium bg-primary-50" : "text-foreground-500 hover:bg-default-100"}`}
                                                     >
                                                         {subItem.title}
@@ -194,6 +225,7 @@ export function AppSidebar() {
                                     ) : (
                                         <Link
                                             href={item.url}
+                                            onClick={() => onClose?.()}
                                             className={`flex items-center gap-3 py-2 px-3 rounded-lg transition-colors ${isCollapsed ? "justify-center" : ""} ${item.isActive ? "bg-primary text-primary-foreground" : "text-foreground-600 hover:bg-default-100"}`}
                                             title={isCollapsed ? item.title : undefined}
                                         >
@@ -240,5 +272,40 @@ export function AppSidebar() {
                 </Button>
             </div>
         </aside>
+    )
+
+    return (
+        <>
+            {/* Desktop Sidebar */}
+            <div className="hidden md:flex sticky top-0 h-screen z-40">
+                {sidebarContent}
+            </div>
+
+            {/* Mobile Sidebar */}
+            <AnimatePresence>
+                {isOpen && (
+                    <>
+                        {/* Overlay */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onClose}
+                            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] md:hidden"
+                        />
+                        {/* Drawer */}
+                        <motion.div
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="fixed inset-y-0 left-0 z-[70] md:hidden shadow-2xl"
+                        >
+                            {sidebarContent}
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </>
     )
 }

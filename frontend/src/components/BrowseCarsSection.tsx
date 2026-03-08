@@ -21,6 +21,8 @@ export function BrowseCarsSection() {
     const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
     useEffect(() => {
+        if (!isInView) return;
+
         const fetchCars = async () => {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://atlasrentalcar-backend.netlify.app/api'}/cars`);
@@ -34,7 +36,7 @@ export function BrowseCarsSection() {
         };
 
         fetchCars();
-    }, []);
+    }, [isInView]);
 
     const filteredCars = useMemo(() => {
         return cars.filter((car) => {
@@ -222,7 +224,7 @@ export function BrowseCarsSection() {
                                     className="cursor-pointer group"
                                 >
                                     <div className="bg-gray-100 rounded-2xl overflow-hidden mb-4">
-                                        <img src={car.img} alt={car.name} className="w-full h-[250px] md:h-[300px] object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
+                                        <img loading="lazy" decoding="async" src={car.img} alt={car.name} className="w-full h-[250px] md:h-[300px] object-cover transition-transform duration-500 group-hover:scale-105" />
                                     </div>
                                     <h3 className="text-[#111827] text-[14px] leading-[20px] font-bold font-['Inter']">{car.name}</h3>
                                     <div className="flex items-center justify-between mt-1">

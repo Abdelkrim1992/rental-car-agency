@@ -88,7 +88,7 @@ export default function CarsPage() {
                                 <Link href={`/cars/${car.id}`}>
                                     <motion.div whileHover={{ y: -4 }} className="group cursor-pointer">
                                         <div className="bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
-                                            <img src={car.img} alt={car.name} className="w-full h-[280px] object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                                            <img loading="lazy" decoding="async" src={car.img} alt={car.name} className="w-full h-[280px] object-cover transition-transform duration-500 group-hover:scale-105" />
                                             <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1">
                                                 <span className="text-white text-[10px] tracking-[0.5px] uppercase">{car.type}</span>
                                             </div>

@@ -45,7 +45,7 @@ export function FeaturedRideSection() {
                     transition={{ duration: 1.5, ease: "easeOut" }}
                     className="absolute inset-0 opacity-90"
                 >
-                    <img src={featuredRide.img} alt={featuredRide.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    <img loading="lazy" decoding="async" src={featuredRide.img} alt={featuredRide.name} className="w-full h-full object-cover" />
                 </motion.div>
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 flex flex-col justify-between p-6 md:p-10 lg:p-12">

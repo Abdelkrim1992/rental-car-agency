@@ -78,7 +78,7 @@ export function WhyUsSection() {
                                                 transition={{ duration: 0.5, delay: 0.1 }}
                                                 className="bg-gray-200 rounded-2xl overflow-hidden h-[200px] md:h-[320px] w-full"
                                             >
-                                                <img src={imgRacing} alt="Racing cars" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                                                <img loading="lazy" decoding="async" src={imgRacing} alt="Racing cars" className="w-full h-full object-cover" />
                                             </motion.div>
                                         </div>
                                     </div>

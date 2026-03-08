@@ -1,0 +1,28 @@
+# Dashboard Enhancements Task List
+
+- [ ] **Common UI Components**
+    - [ ] Create `ConfirmModal` component (reusable HeroUI modal)
+- [ ] **Bookings Dashboard**
+    - [ ] Add "Select All" checkbox logic to the bookings table
+    - [ ] Update delete action to use `ConfirmModal`
+- [ ] **Vehicles Dashboard**
+    - [ ] Update delete action to use `ConfirmModal`
+- [ ] **Notifications Revamp**
+    - [ ] Backend: Create `notifications` table in Supabase
+    - [ ] Backend: Add `notifications` routes (fetch, mark read)
+    - [ ] Backend: Update `bookings` and `messages` routes to persist notifications
+    - [ ] Frontend: Create `notificationsSlice`
+    - [ ] Frontend: Refactor [Header.tsx](file:///d:/car%20rental%20landing%20page/frontend/src/components/dashboard/Header.tsx) notifications dropdown
+        - [ ] Show only 5 items initially
+        - [ ] Mark all as read on toggle/click
+        - [ ] Add "See previous" / Scroll functionality
+- [ ] **Finance Dashboard**
+    - [ ] Create `FinancePage` at `/dashboard/finance`
+    - [ ] Add summary cards (Total Revenue, Growth, Expenses)
+    - [ ] Add Revenue Chart (Area or Bar chart)
+    - [ ] Add "Export to PDF" functionality
+    - [ ] Add link to sidebar
+- [ ] **Final Verification**
+    - [ ] Test notification persistence after deleting resources
+    - [ ] Test bulk selection UI
+    - [ ] Test PDF export layout

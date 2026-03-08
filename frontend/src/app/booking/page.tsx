@@ -17,7 +17,38 @@ function BookingContent() {
     const [confirmed, setConfirmed] = useState(false);
 
     const carId = searchParams.get("carId") || form.carId;
-    const car = browseCars.find((c) => c.id === carId);
+    const [car, setCar] = useState<any>(null);
+    const [carLoading, setCarLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCar = async () => {
+            if (!carId) {
+                setCarLoading(false);
+                return;
+            }
+
+            const staticCar = browseCars.find((c) => c.id === carId);
+            if (staticCar) {
+                setCar(staticCar);
+                setCarLoading(false);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://atlasrentalcar-backend.netlify.app/api'}/cars/${carId}`);
+                if (!res.ok) throw new Error("Car not found");
+                const data = await res.json();
+                setCar(data);
+            } catch (err) {
+                console.error(err);
+                setCar(null);
+            } finally {
+                setCarLoading(false);
+            }
+        };
+
+        fetchCar();
+    }, [carId]);
 
     useEffect(() => {
         if (carId && carId !== form.carId) {
@@ -152,9 +183,13 @@ function BookingContent() {
 
                 {/* Car Summary */}
                 <div>
-                    {car ? (
+                    {carLoading ? (
+                        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center justify-center min-h-[300px]">
+                            <p className="text-gray-400 text-[14px]">Loading car details...</p>
+                        </div>
+                    ) : car ? (
                         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm sticky top-24">
-                            <img src={car.img} alt={car.name} className="w-full h-[180px] object-cover rounded-xl mb-4" />
+                            <img loading="lazy" decoding="async" src={car.img} alt={car.name} className="w-full h-[180px] object-cover rounded-xl mb-4" />
                             <h3 className="text-[18px] font-bold text-[#111827]">{car.name}</h3>
                             <p className="text-gray-400 text-[12px] mt-1">{car.type} • {car.brand}</p>
                             <div className="border-t border-gray-100 mt-4 pt-4">

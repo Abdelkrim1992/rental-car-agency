@@ -75,7 +75,7 @@ export function ReviewsSection() {
                                 className="flex items-center gap-4"
                             >
                                 <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                                    <img src={review.avatar} alt={review.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                                    <img loading="lazy" decoding="async" src={review.avatar} alt={review.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div>
                                     <p className="text-[#111827] text-[14px] leading-[20px] font-normal font-['Inter']">{review.name}</p>

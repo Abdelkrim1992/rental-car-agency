@@ -9,16 +9,42 @@ import { Navbar } from "@/components/Navbar";
 import { FooterSection } from "@/components/FooterSection";
 import { useAppDispatch } from "@/store/hooks";
 import { setBookingForm } from "@/store/slices/bookingSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { initAuth } from "@/store/slices/authSlice";
 
 export default function CarDetailPage() {
     const params = useParams();
-    const car = browseCars.find((c) => c.id === params.id);
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const [car, setCar] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => { dispatch(initAuth()); }, [dispatch]);
+
+    useEffect(() => {
+        const fetchCar = async () => {
+            const staticCar = browseCars.find((c) => c.id === params.id);
+            if (staticCar) {
+                setCar(staticCar);
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://atlasrentalcar-backend.netlify.app/api'}/cars/${params.id}`);
+                if (!res.ok) throw new Error("Car not found");
+                const data = await res.json();
+                setCar(data);
+            } catch (err) {
+                console.error(err);
+                setCar(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCar();
+    }, [params.id]);
 
     const handleBookNow = () => {
         if (car) {
@@ -26,6 +52,17 @@ export default function CarDetailPage() {
             router.push(`/booking?carId=${car.id}`);
         }
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white">
+                <Navbar variant="transparent" />
+                <div className="flex items-center justify-center py-32">
+                    <p className="text-gray-500">Loading...</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!car) {
         return (

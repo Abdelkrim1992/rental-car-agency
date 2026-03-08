@@ -102,8 +102,8 @@ export default function MessagesPage() {
                             <TableColumn>Status</TableColumn>
                             <TableColumn>Sender</TableColumn>
                             <TableColumn className="hidden md:table-cell">Contact</TableColumn>
-                            <TableColumn>Message</TableColumn>
-                            <TableColumn className="text-right">Received</TableColumn>
+                            <TableColumn className="hidden sm:table-cell">Message</TableColumn>
+                            <TableColumn className="text-right hidden lg:table-cell">Received</TableColumn>
                             <TableColumn className="text-right">Actions</TableColumn>
                         </TableHeader>
                         <TableBody
@@ -144,12 +144,12 @@ export default function MessagesPage() {
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="hidden sm:table-cell">
                                         <p className="text-small text-default-500 line-clamp-1 italic">
                                             &ldquo;{msg.message}&rdquo;
                                         </p>
                                     </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell className="text-right hidden lg:table-cell">
                                         <div className="flex flex-col items-end">
                                             <span className="text-small font-medium">{new Date(msg.created_at).toLocaleDateString()}</span>
                                             <span className="text-tiny text-default-400 flex items-center gap-1">

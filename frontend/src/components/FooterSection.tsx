@@ -22,7 +22,7 @@ export function FooterSection() {
                     {footerLocations.map((loc) => (
                         <div key={loc.country} className="flex items-start gap-4">
                             <div className="w-8 h-5 rounded bg-gray-200 overflow-hidden shrink-0">
-                                <img src={loc.flag} alt={loc.country} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                                <img loading="lazy" decoding="async" src={loc.flag} alt={loc.country} className="w-full h-full object-cover" />
                             </div>
                             <div>
                                 <h4 className="text-black text-[12px] tracking-[0.6px] uppercase mb-1 font-normal font-['Inter']">{loc.country}</h4>
