@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { initAuth } from "@/store/slices/authSlice";
 import { fetchBookings } from "@/store/slices/bookingSlice";
 import { fetchMessages } from "@/store/slices/messagesSlice";
+import { fetchNotifications } from "@/store/slices/notificationsSlice";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { Header } from "@/components/dashboard/Header";
 import { RealtimeNotifications } from "@/components/dashboard/RealtimeNotifications";
@@ -38,6 +39,7 @@ export default function DashboardLayout({
         if (user) {
             dispatch(fetchBookings());
             dispatch(fetchMessages());
+            dispatch(fetchNotifications());
         }
     }, [user, dispatch]);
 

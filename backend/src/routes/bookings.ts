@@ -308,6 +308,27 @@ router.patch("/admin/:id", authMiddleware, async (req: AuthRequest, res: Respons
     }
 });
 
+// Admin: POST /api/bookings/admin/bulk-delete — Bulk delete bookings (protected)
+router.post("/admin/bulk-delete", authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            res.status(400).json({ error: "Invalid booking IDs" });
+            return;
+        }
+        const { error } = await supabaseAdmin
+            .from("bookings")
+            .delete()
+            .in("id", ids);
+
+        if (error) throw error;
+        res.json({ success: true, count: ids.length });
+    } catch (err) {
+        console.error("Error bulk deleting admin bookings:", err);
+        res.status(500).json({ error: "Failed to bulk delete bookings" });
+    }
+});
+
 // Admin: DELETE /api/bookings/admin/:id — Delete ANY booking (protected)
 router.delete("/admin/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
     try {

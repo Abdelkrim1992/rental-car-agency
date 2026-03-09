@@ -209,6 +209,32 @@ export const deleteBooking = createAsyncThunk(
     }
 );
 
+// Admin: delete multiple bookings via API
+export const deleteBookings = createAsyncThunk(
+    "booking/deleteBookings",
+    async (ids: string[], { rejectWithValue }) => {
+        try {
+            const supabase = createClient();
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token || "";
+
+            const response = await fetchWithTimeout(`${API_URL}/bookings/admin/bulk-delete`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ids })
+            });
+
+            if (!response.ok) throw new Error("Failed to delete bookings");
+            return ids;
+        } catch (err) {
+            return rejectWithValue(err instanceof Error ? err.message : "Failed to delete bookings");
+        }
+    }
+);
+
 const bookingSlice = createSlice({
     name: "booking",
     initialState,
@@ -258,6 +284,14 @@ const bookingSlice = createSlice({
             .addCase(deleteBooking.rejected, (state, action) => {
                 state.error = action.payload as string;
                 alert("Failed to delete booking: " + String(action.payload));
+            })
+            .addCase(deleteBookings.fulfilled, (state, action) => {
+                const deletedIds = action.payload;
+                state.bookings = state.bookings.filter((b) => !deletedIds.includes(b.id));
+            })
+            .addCase(deleteBookings.rejected, (state, action) => {
+                state.error = action.payload as string;
+                alert("Failed to delete some bookings: " + String(action.payload));
             });
     },
 });

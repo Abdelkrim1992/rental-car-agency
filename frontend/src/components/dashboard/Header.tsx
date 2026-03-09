@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Bell, MessageSquare, Car, Menu, Settings, LogOut, ChevronRight } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { markMessageRead } from "@/store/slices/messagesSlice";
+import { fetchNotifications, markNotificationRead, markAllRead } from "@/store/slices/notificationsSlice";
 import { logoutUser } from "@/store/slices/authSlice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,7 +32,7 @@ export function Header({ onMenuClick }: HeaderProps) {
     const router = useRouter();
     const { user } = useAppSelector((s) => s.auth);
     const { bookings } = useAppSelector((s) => s.booking);
-    const { messages } = useAppSelector((s) => s.messages);
+    const { notifications } = useAppSelector((s) => s.notifications);
 
     const handleLogout = async () => {
         await dispatch(logoutUser());
@@ -40,29 +41,20 @@ export function Header({ onMenuClick }: HeaderProps) {
 
     // Combine and sort notifications
     const { unreadNotifications, allNotifications } = useMemo(() => {
-        const mappedBookings = bookings.map(b => ({
-            id: b.id,
-            type: "booking" as const,
-            isNew: b.status === "pending",
-            title: b.status === "pending" ? "New Booking Request" : "Booking Updated",
-            description: `${b.guest_name} booked ${b.car_name}`,
-            time: b.created_at,
-            link: `/dashboard/bookings/${b.id}`,
-            status: b.status
+        // We now primarily use the database-backed notifications
+        // but can still include local ones if needed, or just map them directly
+        const mappedFromDb = notifications.map(n => ({
+            id: n.id,
+            type: n.type,
+            isNew: n.status === "unread",
+            title: n.title,
+            description: n.description,
+            time: n.created_at,
+            link: n.type === 'booking' ? `/dashboard/bookings/${n.resource_id}` : `/dashboard/messages`,
+            status: n.status
         }));
 
-        const mappedMessages = messages.map(m => ({
-            id: m.id,
-            type: "message" as const,
-            isNew: m.status === "unread",
-            title: m.status === "unread" ? "New Message Received" : "Message",
-            description: `From ${m.name}: ${m.message.slice(0, 40)}...`,
-            time: m.created_at,
-            link: `/dashboard/messages`,
-            status: m.status
-        }));
-
-        const combined = [...mappedBookings, ...mappedMessages].sort(
+        const combined = [...mappedFromDb].sort(
             (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()
         );
 
@@ -70,16 +62,18 @@ export function Header({ onMenuClick }: HeaderProps) {
             unreadNotifications: combined.filter(n => n.isNew),
             allNotifications: combined.slice(0, 8)
         };
-    }, [bookings, messages]);
+    }, [notifications]);
 
     const displayList = unreadNotifications.length > 0 ? unreadNotifications : allNotifications;
 
     const handleMarkAllRead = () => {
-        unreadNotifications.forEach(n => {
-            if (n.type === "message") {
-                dispatch(markMessageRead(n.id));
-            }
-        });
+        dispatch(markAllRead());
+    };
+
+    const handleOpenChange = (isOpen: boolean) => {
+        if (isOpen) {
+            dispatch(fetchNotifications());
+        }
     };
 
     return (
@@ -104,7 +98,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
             <div className="flex items-center gap-2 md:gap-4">
                 {/* Notifications */}
-                <Dropdown placement="bottom-end">
+                <Dropdown placement="bottom-end" onOpenChange={handleOpenChange}>
                     <DropdownTrigger>
                         <Button
                             isIconOnly

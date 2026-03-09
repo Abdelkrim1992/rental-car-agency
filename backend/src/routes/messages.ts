@@ -72,6 +72,27 @@ router.patch("/:id/read", authMiddleware, async (req: AuthRequest, res: Response
     }
 });
 
+// POST /api/messages/bulk-delete — Bulk delete messages (Admin Protected)
+router.post("/bulk-delete", authMiddleware, async (req: AuthRequest, res: Response) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            res.status(400).json({ error: "Invalid message IDs" });
+            return;
+        }
+        const { error } = await supabaseAdmin
+            .from("messages")
+            .delete()
+            .in("id", ids);
+
+        if (error) throw error;
+        res.json({ success: true, count: ids.length });
+    } catch (err) {
+        console.error("Error bulk deleting messages:", err);
+        res.status(500).json({ error: "Failed to bulk delete messages" });
+    }
+});
+
 // DELETE /api/messages/:id — Delete message (Admin Protected)
 router.delete("/:id", authMiddleware, async (req: AuthRequest, res: Response) => {
     try {

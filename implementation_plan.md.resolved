@@ -1,28 +1,47 @@
-# Dashboard Enhancements Task List
+# Dashboard Enhancements Implementation Plan
 
-- [ ] **Common UI Components**
-    - [ ] Create `ConfirmModal` component (reusable HeroUI modal)
-- [ ] **Bookings Dashboard**
-    - [ ] Add "Select All" checkbox logic to the bookings table
-    - [ ] Update delete action to use `ConfirmModal`
-- [ ] **Vehicles Dashboard**
-    - [ ] Update delete action to use `ConfirmModal`
-- [ ] **Notifications Revamp**
-    - [ ] Backend: Create `notifications` table in Supabase
-    - [ ] Backend: Add `notifications` routes (fetch, mark read)
-    - [ ] Backend: Update `bookings` and `messages` routes to persist notifications
-    - [ ] Frontend: Create `notificationsSlice`
-    - [ ] Frontend: Refactor [Header.tsx](file:///d:/car%20rental%20landing%20page/frontend/src/components/dashboard/Header.tsx) notifications dropdown
-        - [ ] Show only 5 items initially
-        - [ ] Mark all as read on toggle/click
-        - [ ] Add "See previous" / Scroll functionality
-- [ ] **Finance Dashboard**
-    - [ ] Create `FinancePage` at `/dashboard/finance`
-    - [ ] Add summary cards (Total Revenue, Growth, Expenses)
-    - [ ] Add Revenue Chart (Area or Bar chart)
-    - [ ] Add "Export to PDF" functionality
-    - [ ] Add link to sidebar
-- [ ] **Final Verification**
-    - [ ] Test notification persistence after deleting resources
-    - [ ] Test bulk selection UI
-    - [ ] Test PDF export layout
+This plan outlines the steps to add bulk selection, confirmation modals, a finance dashboard, and persistent notifications.
+
+## Proposed Changes
+
+### [Backend] Persistence & Notifications
+- [NEW] `backend/src/routes/notifications.ts`: Routes for managing notifications.
+- [MODIFY] [backend/src/routes/bookings.ts](file:///d:/car%20rental%20landing%20page/backend/src/routes/bookings.ts): Insert record into `notifications` when a booking is created.
+- [MODIFY] [backend/src/routes/messages.ts](file:///d:/car%20rental%20landing%20page/backend/src/routes/messages.ts): Insert record into `notifications` when a message is created.
+- [MODIFY] [backend/src/index.ts](file:///d:/car%20rental%20landing%20page/backend/src/index.ts): Register notifications route.
+
+### [Frontend] Core Components
+- [NEW] `frontend/src/components/dashboard/ConfirmModal.tsx`: A reusable modal for destructive actions.
+
+### [Frontend] Dashbaord State
+- [NEW] `frontend/src/store/slices/notificationsSlice.ts`: State management for persistent notifications.
+- [MODIFY] [frontend/src/store/store.ts](file:///d:/car%20rental%20landing%20page/frontend/src/store/store.ts): Add `notificationsSlice` to the store.
+
+### [Frontend] Feature Pages
+- [MODIFY] [frontend/src/app/dashboard/bookings/page.tsx](file:///d:/car%20rental%20landing%20page/frontend/src/app/dashboard/bookings/page.tsx): 
+    - Add multi-selection logic.
+    - Integrate `ConfirmModal` for deletion.
+- [MODIFY] [frontend/src/app/dashboard/vehicles/all/page.tsx](file:///d:/car%20rental%20landing%20page/frontend/src/app/dashboard/vehicles/all/page.tsx):
+    - Integrate `ConfirmModal` for deletion.
+- [NEW] `frontend/src/app/dashboard/finance/page.tsx`:
+    - Financial charts and metrics.
+    - PDF export functionality.
+
+### [Frontend] Layout & Navigation
+- [MODIFY] [frontend/src/components/dashboard/Header.tsx](file:///d:/car%20rental%20landing%20page/frontend/src/components/dashboard/Header.tsx):
+    - Display 5 notifications max.
+    - Persistence logic (fetch from API instead of Redux state).
+    - "See previous" pagination/scroll.
+- [MODIFY] [frontend/src/components/dashboard/AppSidebar.tsx](file:///d:/car%20rental%20landing%20page/frontend/src/components/dashboard/AppSidebar.tsx):
+    - Add "Finance" link to the nav menu.
+
+## Verification Plan
+
+### Automated Tests
+- Manual Testing
+
+### Manual Verification
+1.  **Selection**: Toggle "Select All" in bookings, verify all checkboxes reflect state.
+2.  **Confirmation**: Click delete on a booking, verify modal appears, then confirm delete.
+3.  **Finance**: Navigate to /dashboard/finance, verify charts load, click "PDF Export" and check result.
+4.  **Notifications**: Create a new booking, see it in notifications. Delete the booking, verify notification remains. Click notification bell, see only 5 items. Click "See previous", verify more items load.

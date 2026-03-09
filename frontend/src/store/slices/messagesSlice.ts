@@ -133,6 +133,32 @@ export const deleteMessage = createAsyncThunk(
     }
 );
 
+// Admin: bulk delete messages via API
+export const deleteMessages = createAsyncThunk(
+    "messages/deleteMessages",
+    async (ids: string[], { rejectWithValue }) => {
+        try {
+            const supabase = createClient();
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token || "";
+
+            const response = await fetchWithTimeout(`${API_URL}/messages/bulk-delete`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ids })
+            });
+
+            if (!response.ok) throw new Error("Failed to delete messages");
+            return ids;
+        } catch (err) {
+            return rejectWithValue(err instanceof Error ? err.message : "Failed to delete messages");
+        }
+    }
+);
+
 // Admin: reply to message via API
 export const replyToMessage = createAsyncThunk(
     "messages/replyToMessage",
@@ -200,6 +226,13 @@ const messagesSlice = createSlice({
             })
             .addCase(deleteMessage.fulfilled, (state, action) => {
                 state.messages = state.messages.filter(m => m.id !== action.payload);
+            })
+            .addCase(deleteMessages.fulfilled, (state, action) => {
+                const ids = action.payload;
+                state.messages = state.messages.filter(m => !ids.includes(m.id));
+            })
+            .addCase(deleteMessages.rejected, (state, action) => {
+                state.error = action.payload as string;
             })
             .addCase(replyToMessage.pending, (state) => {
                 state.loading = true;

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchMessages, markMessageRead, deleteMessage, replyToMessage, Message } from "@/store/slices/messagesSlice";
+import { fetchMessages, markMessageRead, deleteMessage, deleteMessages, replyToMessage, Message } from "@/store/slices/messagesSlice";
+import { ConfirmModal } from "@/components/dashboard/ConfirmModal";
 import {
     Table,
     TableHeader,
@@ -38,6 +39,10 @@ export default function MessagesPage() {
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
     const [replyText, setReplyText] = useState("");
     const [isReplying, setIsReplying] = useState(false);
+    const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     useEffect(() => {
         dispatch(fetchMessages());
@@ -50,9 +55,26 @@ export default function MessagesPage() {
     };
 
     const handleDelete = (id: string) => {
-        if (confirm("Are you sure you want to delete this message?")) {
-            dispatch(deleteMessage(id));
+        setDeletingId(id);
+        setIsBulkDeleting(false);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleBulkDelete = () => {
+        setIsBulkDeleting(true);
+        setDeletingId(null);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (isBulkDeleting) {
+            const ids = Array.from(selectedKeys) as string[];
+            await dispatch(deleteMessages(ids)).unwrap();
+            setSelectedKeys(new Set([]));
+        } else if (deletingId) {
+            await dispatch(deleteMessage(deletingId)).unwrap();
         }
+        setIsDeleteModalOpen(false);
     };
 
     const handleOpenMessage = (msg: Message) => {
@@ -84,6 +106,25 @@ export default function MessagesPage() {
                 </p>
             </div>
 
+            {selectedKeys.size > 0 && (
+                <Card className="bg-primary-50 border-primary-200">
+                    <CardBody className="py-2 px-4 flex flex-row items-center justify-between">
+                        <p className="text-sm font-medium text-primary-700">
+                            {selectedKeys === "all" ? messages.length : selectedKeys.size} messages selected
+                        </p>
+                        <Button
+                            color="danger"
+                            size="sm"
+                            variant="flat"
+                            startContent={<Trash2 size={16} />}
+                            onPress={handleBulkDelete}
+                        >
+                            Delete Selected
+                        </Button>
+                    </CardBody>
+                </Card>
+            )}
+
             <Card>
                 <CardHeader className="pb-2">
                     <div>
@@ -95,7 +136,9 @@ export default function MessagesPage() {
                     <Table
                         aria-label="Messages table"
                         removeWrapper
-                        selectionMode="single"
+                        selectionMode="multiple"
+                        selectedKeys={selectedKeys}
+                        onSelectionChange={setSelectedKeys}
                         onRowAction={(key) => handleOpenMessage(messages.find(m => m.id === key) as Message)}
                     >
                         <TableHeader>
@@ -255,6 +298,17 @@ export default function MessagesPage() {
                     )}
                 </ModalContent>
             </Modal>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title={isBulkDeleting ? "Delete Selected Messages" : "Delete Message"}
+                message={isBulkDeleting
+                    ? `Are you sure you want to permanently remove ${selectedKeys === 'all' ? messages.length : selectedKeys.size} selected messages?`
+                    : "Are you sure you want to permanently remove this message?"
+                }
+            />
         </div>
     );
 }

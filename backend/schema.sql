@@ -197,4 +197,18 @@ CREATE POLICY "Users can update own bookings" ON bookings FOR UPDATE USING (true
 -- Allow deleting bookings
 CREATE POLICY "Admin can delete bookings" ON bookings FOR DELETE USING (true);
 
--- Done! Guest bookings should now work.
+-- 9. Notifications table
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('booking', 'message', 'alert')),
+    resource_id UUID,
+    payload JSONB,
+    status TEXT DEFAULT 'unread' CHECK (status IN ('unread', 'read')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Row Level Security (RLS) configuration for notifications
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admins can view and manage notifications" ON notifications USING (true);

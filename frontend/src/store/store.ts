@@ -6,6 +6,7 @@ import reviewsReducer from "./slices/reviewsSlice";
 import uiReducer from "./slices/uiSlice";
 import messagesReducer from "./slices/messagesSlice";
 import settingsReducer from "./slices/settingsSlice";
+import notificationsReducer from "./slices/notificationsSlice";
 
 export const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
         ui: uiReducer,
         messages: messagesReducer,
         settings: settingsReducer,
+        notifications: notificationsReducer,
     },
 });
 

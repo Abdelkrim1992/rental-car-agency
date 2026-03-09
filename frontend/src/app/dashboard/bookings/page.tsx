@@ -1,7 +1,8 @@
 "use client";
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { fetchBookings, updateBooking, deleteBooking } from "@/store/slices/bookingSlice";
+import { fetchBookings, updateBooking, deleteBooking, deleteBookings } from "@/store/slices/bookingSlice";
+import { ConfirmModal } from "@/components/dashboard/ConfirmModal";
 import {
     Card,
     CardBody,
@@ -33,6 +34,10 @@ export default function BookingsPage() {
     const { bookings, loading } = useAppSelector((state) => state.booking);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState("10");
+    const [selectedKeys, setSelectedKeys] = useState<any>(new Set([]));
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
     useEffect(() => {
         dispatch(fetchBookings());
@@ -52,9 +57,26 @@ export default function BookingsPage() {
     };
 
     const handleDeleteBooking = (id: string) => {
-        if (window.confirm("Are you sure you want to permanently remove this booking?")) {
-            dispatch(deleteBooking(id));
+        setDeletingId(id);
+        setIsBulkDeleting(false);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleBulkDelete = () => {
+        setIsBulkDeleting(true);
+        setDeletingId(null);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (isBulkDeleting) {
+            const ids = Array.from(selectedKeys) as string[];
+            await dispatch(deleteBookings(ids)).unwrap();
+            setSelectedKeys(new Set([]));
+        } else if (deletingId) {
+            await dispatch(deleteBooking(deletingId)).unwrap();
         }
+        setIsDeleteModalOpen(false);
     };
 
     const getStatusColor = (status: string): "default" | "primary" | "success" | "warning" | "danger" => {
@@ -84,6 +106,25 @@ export default function BookingsPage() {
                 </Button>
             </div>
 
+            {selectedKeys.size > 0 && (
+                <Card className="bg-primary-50 border-primary-200">
+                    <CardBody className="py-2 px-4 flex flex-row items-center justify-between">
+                        <p className="text-sm font-medium text-primary-700">
+                            {selectedKeys === "all" ? bookings.length : selectedKeys.size} bookings selected
+                        </p>
+                        <Button
+                            color="danger"
+                            size="sm"
+                            variant="flat"
+                            startContent={<X size={16} />}
+                            onPress={handleBulkDelete}
+                        >
+                            Delete Selected
+                        </Button>
+                    </CardBody>
+                </Card>
+            )}
+
             <Card>
                 <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
                     <div>
@@ -97,6 +138,9 @@ export default function BookingsPage() {
                     <Table
                         aria-label="Bookings table"
                         removeWrapper
+                        selectionMode="multiple"
+                        selectedKeys={selectedKeys}
+                        onSelectionChange={setSelectedKeys}
                     >
                         <TableHeader>
                             <TableColumn>Status</TableColumn>
@@ -227,6 +271,17 @@ export default function BookingsPage() {
                     )}
                 </CardBody>
             </Card>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title={isBulkDeleting ? "Delete Selected Bookings" : "Delete Booking"}
+                message={isBulkDeleting
+                    ? `Are you sure you want to permanently remove ${selectedKeys === 'all' ? bookings.length : selectedKeys.size} selected bookings?`
+                    : "Are you sure you want to permanently remove this booking record?"
+                }
+            />
         </div>
     );
 }
