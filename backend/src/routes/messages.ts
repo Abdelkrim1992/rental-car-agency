@@ -49,6 +49,15 @@ router.post("/", async (req: Request, res: Response) => {
         // Broadcast to all connected WebSocket clients (dashboard)
         broadcastEvent("NEW_MESSAGE", data);
 
+        // Persistent notification
+        await supabaseAdmin.from("notifications").insert({
+            title: "New Message",
+            description: `From ${data.name}: ${data.message.slice(0, 50)}...`,
+            type: "message",
+            resource_id: data.id,
+            status: "unread",
+        });
+
         res.status(201).json(data);
     } catch (err) {
         console.error("Error creating message:", err);

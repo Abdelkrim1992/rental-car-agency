@@ -78,6 +78,15 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
         // Broadcast to dashboard WebSocket clients
         broadcastEvent("NEW_BOOKING", bookingResult);
 
+        // Persistent notification
+        await supabaseAdmin.from("notifications").insert({
+            title: "New Booking Request",
+            description: `${bookingResult.car_name} requested by client`,
+            type: "booking",
+            resource_id: bookingResult.id,
+            status: "unread",
+        });
+
         res.status(201).json(bookingResult);
     } catch (err) {
         console.error("Error creating booking:", err);
@@ -224,6 +233,15 @@ router.post("/guest", async (req: Request, res: Response) => {
 
         // Broadcast to dashboard WebSocket clients
         broadcastEvent("NEW_BOOKING", bookingResult);
+
+        // Persistent notification
+        await supabaseAdmin.from("notifications").insert({
+            title: "New Guest Booking",
+            description: `${bookingResult.guest_name} requested ${bookingResult.car_name}`,
+            type: "booking",
+            resource_id: bookingResult.id,
+            status: "unread",
+        });
 
         res.status(201).json(bookingResult);
     } catch (err) {

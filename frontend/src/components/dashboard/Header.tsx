@@ -60,7 +60,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         return {
             unreadNotifications: combined.filter(n => n.isNew),
-            allNotifications: combined.slice(0, 8)
+            allNotifications: combined.slice(0, 5)
         };
     }, [notifications]);
 
@@ -134,6 +134,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                                     <DropdownItem
                                         key={`${n.type}-${n.id}`}
                                         className={`px-4 py-3 border-b last:border-0 ${n.isNew ? "bg-primary-50" : ""}`}
+                                        onPress={() => dispatch(markNotificationRead(n.id))}
                                         textValue={n.title}
                                     >
                                         <Link href={n.link} className="flex gap-4 w-full">
@@ -155,6 +156,29 @@ export function Header({ onMenuClick }: HeaderProps) {
                                     </DropdownItem>
                                 ))
                             )}
+                        </DropdownSection>
+                        <DropdownSection className="p-2 border-t border-default-100">
+                            <DropdownItem key="actions" className="p-0 pointer-events-none">
+                                <div className="flex items-center justify-between gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="light"
+                                        className="text-primary font-semibold flex-1"
+                                        onPress={handleMarkAllRead}
+                                    >
+                                        Mark all as read
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="flat"
+                                        className="text-default-500 font-semibold flex-1"
+                                        as={Link}
+                                        href="/dashboard/notifications"
+                                    >
+                                        See all
+                                    </Button>
+                                </div>
+                            </DropdownItem>
                         </DropdownSection>
                     </DropdownMenu>
                 </Dropdown>

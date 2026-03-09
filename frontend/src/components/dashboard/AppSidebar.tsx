@@ -16,6 +16,7 @@ import {
     Leaf,
     MessageSquare,
     ChevronRight,
+    DollarSign,
 } from "lucide-react"
 import {
     Listbox,
@@ -120,6 +121,12 @@ export function AppSidebar({ isOpen = false, onClose }: AppSidebarProps) {
                             url: "/dashboard/payments",
                         }
                     ]
+                },
+                {
+                    title: "Finance",
+                    url: "/dashboard/finance",
+                    icon: DollarSign,
+                    isActive: isActive("/dashboard/finance"),
                 }
             ],
         },

@@ -100,6 +100,8 @@ CREATE POLICY "Admins can delete messages" ON messages FOR DELETE USING (true);
 -- Cars: publicly readable
 ALTER TABLE cars ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Cars are viewable by everyone" ON cars FOR SELECT USING (true);
+CREATE POLICY "Admins can update cars" ON cars FOR UPDATE USING (true);
+CREATE POLICY "Admins can delete cars" ON cars FOR DELETE USING (true);
 
 -- Profiles: users can read their own profile
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;

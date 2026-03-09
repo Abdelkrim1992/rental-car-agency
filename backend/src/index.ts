@@ -8,6 +8,7 @@ import bookingsRouter from "./routes/bookings.js";
 import reviewsRouter from "./routes/reviews.js";
 import messagesRouter from "./routes/messages.js";
 import settingsRouter from "./routes/settings.js";
+import notificationsRouter from "./routes/notifications.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { initWebSocketServer } from "./wsServer.js";
 
@@ -65,6 +66,7 @@ app.use("/api/bookings", bookingsRouter);
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/api/settings", settingsRouter);
+app.use("/api/notifications", notificationsRouter);
 
 // Error handler
 app.use(errorHandler);

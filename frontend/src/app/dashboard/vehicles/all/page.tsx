@@ -2,6 +2,7 @@
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { deleteCar, fetchCars } from "@/store/slices/carsSlice";
+import { ConfirmModal } from "@/components/dashboard/ConfirmModal";
 import {
     Card,
     CardBody,
@@ -36,6 +37,9 @@ export default function AllVehiclesPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState("5");
     const [viewMode, setViewMode] = useState("table");
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deletingVehicle, setDeletingVehicle] = useState<{ id: string, name: string } | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const rows = parseInt(rowsPerPage);
     const totalPages = Math.ceil(cars.length / rows);
@@ -46,13 +50,22 @@ export default function AllVehiclesPage() {
         dispatch(fetchCars());
     }, [dispatch]);
 
-    const handleDeleteVehicle = async (id: string, name: string) => {
-        if (window.confirm(`Are you sure you want to delete the ${name}?`)) {
-            try {
-                await dispatch(deleteCar(id)).unwrap();
-            } catch (err) {
-                alert("Failed to delete vehicle.");
-            }
+    const handleDeleteVehicle = (id: string, name: string) => {
+        setDeletingVehicle({ id, name });
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!deletingVehicle) return;
+        setIsDeleting(true);
+        try {
+            await dispatch(deleteCar(deletingVehicle.id)).unwrap();
+            setIsDeleteModalOpen(false);
+        } catch (err) {
+            console.error("Failed to delete vehicle:", err);
+        } finally {
+            setIsDeleting(false);
+            setDeletingVehicle(null);
         }
     };
 
@@ -318,6 +331,15 @@ export default function AllVehiclesPage() {
                     )}
                 </CardBody>
             </Card>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Vehicle"
+                message={`Are you sure you want to permanently remove the ${deletingVehicle?.name} from your fleet?`}
+                isLoading={isDeleting}
+            />
         </div>
     );
 }
