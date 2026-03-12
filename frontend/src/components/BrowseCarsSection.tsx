@@ -21,8 +21,6 @@ export function BrowseCarsSection() {
     const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
     useEffect(() => {
-        if (!isInView) return;
-
         const fetchCars = async () => {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://atlasrentalcar-backend.netlify.app/api'}/cars`);
@@ -36,7 +34,7 @@ export function BrowseCarsSection() {
         };
 
         fetchCars();
-    }, [isInView]);
+    }, []);
 
     const filteredCars = useMemo(() => {
         return cars.filter((car) => {
@@ -212,14 +210,14 @@ export function BrowseCarsSection() {
                     {paginatedCars.map((car, i) => (
                         <motion.div
                             key={`${car.name}-${currentPage}`}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 0 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.4, delay: i * 0.1 }}
+                            exit={{ opacity: 0, y: 0 }}
+                            transition={{ duration: 0, delay: i * 0 }}
                         >
                             <Link href={`/cars/${car.id}`}>
                                 <motion.div
-                                    whileHover={{ y: -2 }}
+                                    whileHover={{ y: 0 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                     className="cursor-pointer group"
                                 >

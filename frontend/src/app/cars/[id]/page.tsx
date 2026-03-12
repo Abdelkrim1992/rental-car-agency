@@ -4,7 +4,7 @@ import { browseCars } from "@/data/carsData";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Fuel, MapPin, Gauge } from "lucide-react";
+import { Fuel, MapPin, Gauge, CalendarDays } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { FooterSection } from "@/components/FooterSection";
 import { useAppDispatch } from "@/store/hooks";
@@ -82,7 +82,7 @@ export default function CarDetailPage() {
     return (
         <div className="min-h-screen bg-white font-['Inter',sans-serif]">
             <Navbar variant="transparent" />
-            <div className="px-6 md:px-12 lg:px-24 py-10">
+            <div className="px-6 md:px-12 lg:px-24 pt-24 md:pt-28 pb-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="bg-gray-100 rounded-3xl overflow-hidden">
                         <img src={car.img} alt={car.name} className="w-full h-[400px] lg:h-[500px] object-cover" />
@@ -114,6 +114,31 @@ export default function CarDetailPage() {
                                     <MapPin size={20} className="text-gray-400 mb-2" />
                                     <span className="text-[#111827] text-[14px] font-semibold">{car.location}</span>
                                     <span className="text-gray-400 text-[10px] uppercase tracking-[0.5px]">Location</span>
+                                </div>
+                            </div>
+
+                            {/* Availability Days */}
+                            <div className="mb-8">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <CalendarDays size={16} className="text-gray-400" />
+                                    <span className="text-gray-500 text-[11px] tracking-[0.5px] uppercase">Available Days</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
+                                        const isAvailable = (car.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]).includes(day);
+                                        return (
+                                            <span
+                                                key={day}
+                                                className={`px-3 py-1.5 rounded-full text-[11px] font-medium transition-all ${
+                                                    isAvailable
+                                                        ? "bg-green-50 text-green-700 border border-green-200"
+                                                        : "bg-gray-50 text-gray-300 border border-gray-100 line-through"
+                                                }`}
+                                            >
+                                                {day.slice(0, 3)}
+                                            </span>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

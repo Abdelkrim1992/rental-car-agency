@@ -47,7 +47,7 @@ export default function CarsPage() {
         <div className="min-h-screen bg-white font-['Inter',sans-serif]">
             <Navbar variant="transparent" />
             {/* Page Header */}
-            <div className="bg-[#18181b] text-white px-6 md:px-12 lg:px-24 py-12 md:py-16">
+            <div className="bg-[#18181b] text-white px-6 md:px-12 lg:px-24 pt-24 md:pt-28 pb-12 md:pb-16">
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -84,7 +84,10 @@ export default function CarsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     <AnimatePresence mode="wait">
                         {filteredCars.map((car, i) => (
-                            <motion.div key={car.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3, delay: i * 0.05 }}>
+                            <motion.div key={car.id} initial={{ opacity: 0, y: 0 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            exit={{ opacity: 0, y: 0 }} 
+                            transition={{ duration: 0, delay: i * 0 }}>
                                 <Link href={`/cars/${car.id}`}>
                                     <motion.div whileHover={{ y: 0 }} className="group cursor-pointer">
                                         <div className="bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">

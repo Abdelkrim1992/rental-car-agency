@@ -46,6 +46,7 @@ export const fetchCars = createAsyncThunk("cars/fetchCars", async (_, { rejectWi
             location: c.location || "Location",
             description: c.description || "",
             status: c.status || "Available",
+            availability_days: (c.availability_days as string[]) || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         }));
 
         return mappedCars as BrowseCar[];
@@ -72,6 +73,7 @@ export const fetchCarById = createAsyncThunk("cars/fetchCarById", async (id: str
             location: data.location || "",
             description: data.description || "",
             status: data.status || "Available",
+            availability_days: data.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         } as BrowseCar;
     } catch (err) {
         return rejectWithValue(err instanceof Error ? err.message : "Car not found");
@@ -92,6 +94,7 @@ export const createCar = createAsyncThunk("cars/createCar", async (carData: Part
             location: carData.location,
             description: carData.description,
             status: carData.status || "Available",
+            availability_days: carData.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         }).select().single();
 
         if (error) throw new Error(error.message);
@@ -107,6 +110,7 @@ export const createCar = createAsyncThunk("cars/createCar", async (carData: Part
             location: data.location,
             description: data.description,
             status: data.status,
+            availability_days: data.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         } as BrowseCar;
     } catch (err) {
         return rejectWithValue(err instanceof Error ? err.message : "Failed to create car");
@@ -127,6 +131,7 @@ export const updateCar = createAsyncThunk("cars/updateCar", async ({ id, updates
         if (updates.location) dbUpdates.location = updates.location;
         if (updates.description) dbUpdates.description = updates.description;
         if (updates.status) dbUpdates.status = updates.status;
+        if (updates.availability_days) dbUpdates.availability_days = updates.availability_days;
 
         const { data, error } = await supabase.from("cars").update(dbUpdates).eq("id", id).select();
 
@@ -147,6 +152,7 @@ export const updateCar = createAsyncThunk("cars/updateCar", async ({ id, updates
             location: carData.location,
             description: carData.description,
             status: carData.status,
+            availability_days: carData.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         } as BrowseCar;
     } catch (err) {
         return rejectWithValue(err instanceof Error ? err.message : "Failed to update car");

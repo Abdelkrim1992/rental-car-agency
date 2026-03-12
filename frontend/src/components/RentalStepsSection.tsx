@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { rentalSteps } from "@/data/carsData";
 import { motion, useInView, AnimatePresence } from "motion/react";
 
@@ -7,6 +7,50 @@ export function RentalStepsSection() {
     const sectionRef = useRef<HTMLElement>(null);
     const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
     const [activeIndex, setActiveIndex] = useState(0);
+    const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    // Set ref callback
+    const setCardRef = useCallback((el: HTMLDivElement | null, index: number) => {
+        cardRefs.current[index] = el;
+    }, []);
+
+    // Mobile scroll observer — activate the card that's most visible
+    useEffect(() => {
+        if (!isMobile) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                let bestEntry: IntersectionObserverEntry | null = null;
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+                            bestEntry = entry;
+                        }
+                    }
+                });
+                if (bestEntry) {
+                    const idx = cardRefs.current.indexOf((bestEntry as IntersectionObserverEntry).target as HTMLDivElement);
+                    if (idx !== -1) setActiveIndex(idx);
+                }
+            },
+            { threshold: [0.3, 0.5, 0.7, 1.0], rootMargin: "-10% 0px -10% 0px" }
+        );
+
+        cardRefs.current.forEach((ref) => {
+            if (ref) observer.observe(ref);
+        });
+
+        return () => observer.disconnect();
+    }, [isMobile]);
 
     return (
         <section id="steps" ref={sectionRef} className="w-full max-w-[1280px] mx-auto px-6 md:px-12 lg:px-0 py-12 md:py-16">
@@ -36,10 +80,11 @@ export function RentalStepsSection() {
                         animate={isInView ? { opacity: 1, y: 0 } : {}}
                     >
                         <motion.div
+                            ref={(el: HTMLDivElement | null) => setCardRef(el, i)}
                             whileHover={{ y: 0, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
                             transition={{ type: "spring", stiffness: 300 }}
-                            onHoverStart={() => setActiveIndex(i)}
-                            onHoverEnd={() => setActiveIndex(0)}
+                            onHoverStart={() => !isMobile && setActiveIndex(i)}
+                            onHoverEnd={() => !isMobile && setActiveIndex(0)}
                             onClick={() => setActiveIndex(i)}
                             className={`relative rounded-2xl min-h-[320px] md:min-h-[360px] overflow-hidden cursor-pointer ${activeIndex === i ? "bg-[#18181b]" : "bg-[#f9fafb]"
                                 }`}

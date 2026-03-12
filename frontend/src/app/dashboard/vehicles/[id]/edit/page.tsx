@@ -17,7 +17,9 @@ import {
     Divider,
     Image as HeroImage
 } from "@heroui/react";
-import { ArrowLeft, Trash2, Save, DollarSign, Car, Fuel, MapPin, Type, Image as LucideImage } from "lucide-react";
+import { ArrowLeft, Trash2, Save, DollarSign, Car, Fuel, MapPin, Type, Image as LucideImage, CalendarDays } from "lucide-react";
+
+const ALL_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export default function EditVehiclePage() {
     const params = useParams();
@@ -41,6 +43,7 @@ export default function EditVehiclePage() {
         img: "",
         description: "",
         status: "Available",
+        availability_days: [...ALL_DAYS] as string[],
     });
 
     useEffect(() => {
@@ -55,6 +58,7 @@ export default function EditVehiclePage() {
                 img: car.img,
                 description: car.description || "",
                 status: car.status || "Available",
+                availability_days: car.availability_days || [...ALL_DAYS],
             });
         }
     }, [car]);
@@ -78,6 +82,15 @@ export default function EditVehiclePage() {
         setForm({ ...form, [name]: value });
     };
 
+    const toggleDay = (day: string) => {
+        setForm((prev) => ({
+            ...prev,
+            availability_days: prev.availability_days.includes(day)
+                ? prev.availability_days.filter((d) => d !== day)
+                : [...prev.availability_days, day],
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -92,7 +105,8 @@ export default function EditVehiclePage() {
                     fuel: form.fuel,
                     img: form.img,
                     description: form.description,
-                    status: form.status
+                    status: form.status,
+                    availability_days: form.availability_days,
                 }
             })).unwrap();
             router.push(`/dashboard/vehicles/${carId}`);
@@ -238,6 +252,56 @@ export default function EditVehiclePage() {
                                 <SelectItem key="Rented">Rented</SelectItem>
                                 <SelectItem key="Maintenance">Maintenance</SelectItem>
                             </Select>
+                        </div>
+
+                        {/* Availability Days */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                                <CalendarDays size={16} className="text-default-400" />
+                                <span className="text-small text-default-500 font-medium">Availability Days</span>
+                            </div>
+                            <p className="text-tiny text-default-400">Select which days this vehicle is available for rental</p>
+                            <div className="flex flex-wrap gap-2">
+                                {ALL_DAYS.map((day) => (
+                                    <button
+                                        key={day}
+                                        type="button"
+                                        onClick={() => toggleDay(day)}
+                                        className={`px-4 py-2 rounded-full text-small font-medium transition-all duration-200 border ${
+                                            form.availability_days.includes(day)
+                                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                                : "bg-default-100 text-default-500 border-default-200 hover:bg-default-200"
+                                        }`}
+                                    >
+                                        {day.slice(0, 3)}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setForm((prev) => ({ ...prev, availability_days: [...ALL_DAYS] }))}
+                                    className="text-tiny text-primary hover:underline"
+                                >
+                                    Select All
+                                </button>
+                                <span className="text-tiny text-default-300">•</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setForm((prev) => ({ ...prev, availability_days: ALL_DAYS.filter((d) => !["Saturday", "Sunday"].includes(d)) }))}
+                                    className="text-tiny text-primary hover:underline"
+                                >
+                                    Weekdays Only
+                                </button>
+                                <span className="text-tiny text-default-300">•</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setForm((prev) => ({ ...prev, availability_days: [] }))}
+                                    className="text-tiny text-default-400 hover:underline"
+                                >
+                                    Clear
+                                </button>
+                            </div>
                         </div>
 
                         <Divider />

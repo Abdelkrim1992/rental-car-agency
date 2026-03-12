@@ -57,6 +57,7 @@ export interface BrowseCar {
     location: string;
     description?: string;
     status?: string;
+    availability_days?: string[];
 }
 
 export const browseCars: BrowseCar[] = [

@@ -10,7 +10,7 @@ import {
     Chip,
     Divider
 } from "@heroui/react";
-import { ArrowLeft, Edit, MapPin, Fuel, Car as CarIcon, ShieldCheck, Zap, Gauge } from "lucide-react";
+import { ArrowLeft, Edit, MapPin, Fuel, Car as CarIcon, ShieldCheck, Zap, Gauge, CalendarDays } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -158,6 +158,34 @@ export default function VehicleDetailsPage() {
                         <CardBody>
                             <p className="text-default-600 leading-relaxed italic border-l-4 border-primary pl-4 py-2">
                                 {car.description || "This vehicle represents the pinnacle of our fleet's commitment to delivering an unparalleled driving experience to our premium clientele."}
+                            </p>
+                        </CardBody>
+                    </Card>
+
+                    <Card>
+                        <CardHeader className="flex items-center gap-3 pb-2">
+                            <CalendarDays className="size-5 text-primary" />
+                            <p className="text-large font-bold">Availability Schedule</p>
+                        </CardHeader>
+                        <CardBody>
+                            <div className="flex flex-wrap gap-2">
+                                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
+                                    const isAvailable = (car.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]).includes(day);
+                                    return (
+                                        <Chip
+                                            key={day}
+                                            variant="flat"
+                                            color={isAvailable ? "success" : "default"}
+                                            size="sm"
+                                            className={!isAvailable ? "line-through opacity-50" : ""}
+                                        >
+                                            {day.slice(0, 3)}
+                                        </Chip>
+                                    );
+                                })}
+                            </div>
+                            <p className="text-tiny text-default-400 mt-3">
+                                Available {(car.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]).length} of 7 days per week
                             </p>
                         </CardBody>
                     </Card>

@@ -33,7 +33,7 @@ export function HeroSection() {
     const settings = useAppSelector((state) => state.settings.data);
 
     return (
-        <section id="hero" className="relative w-full min-h-[600px] md:min-h-[800px] overflow-hidden -mt-[72px] pt-[72px]">
+        <section id="hero" className="relative w-full h-screen min-h-[600px] max-h-[1000px] overflow-hidden">
             {/* Background Image */}
             <div className="absolute inset-0">
                 <img
@@ -44,26 +44,25 @@ export function HeroSection() {
                     decoding="async"
                     fetchPriority="high"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40" />
             </div>
 
-            {/* Hero Content */}
-            <div className="relative z-10 flex flex-col justify-end h-full px-6 md:px-12 lg:px-16 pb-16 md:pb-20">
+            {/* Hero Content — Vertically Centered */}
+            <div className="relative z-10 flex flex-col justify-center items-start h-full px-6 md:px-12 lg:px-16">
                 <div className="max-w-[1920px]">
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12"
                     >
-                        <h1 className="text-white font-normal font-['Inter'] text-[48px] md:text-[72px] lg:text-[96px] leading-[1] mb-4 md:mb-6 whitespace-pre-line">
-                            {settings?.hero_title || "Drive Your Dream\nCar Today."}
+                        <h1 className="text-white font-semibold font-['Inter'] text-[55px] md:text-[75px] lg:text-[96px] leading-[1] mb-10 md:mb-10 whitespace-pre-line">
+                            {settings?.hero_title || "Drive Your Dream\nCar Today"}
                         </h1>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-                            className="text-gray-200 text-[14px] md:text-[16px] leading-[24px] max-w-[512px] mb-6 whitespace-pre-line"
+                            className="text-gray-200 text-[14px] md:text-[18px]  max-w-[512px] mb-6 whitespace-pre-line"
                         >
                             {settings?.hero_subtitle || "Discover The Thrill Of Driving Luxury With Our Exclusive Collection Of Well-Maintained Hypercars And Sports Cars Available For Rent."}
                         </motion.p>
@@ -80,37 +79,39 @@ export function HeroSection() {
                             </Link>
                         </motion.div>
                     </motion.div>
+                </div>
+            </div>
 
-                    {/* Animated Stats */}
-                    <div className="flex gap-10 md:gap-16 md:pt-20">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.7 }}
-                            className="flex flex-col gap-1"
-                        >
-                            <span className="text-white text-[28px] md:text-[36px] leading-[40px] font-normal font-['Inter']">
-                                <AnimatedCounter target={settings?.stats_cars || 200} />
-                            </span>
-                            <p className="text-gray-300 text-[12px]">
-                                Luxury Sports Cars<br />Ready To Rent.
-                            </p>
-                        </motion.div>
-                        <div className="w-px h-12 bg-white/30" />
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.9 }}
-                            className="flex flex-col gap-1"
-                        >
-                            <span className="text-white text-[28px] md:text-[36px] leading-[40px] font-normal font-['Inter']">
-                                <AnimatedCounter target={settings?.stats_rentals || 5000} />
-                            </span>
-                            <p className="text-gray-300 text-[12px] leading-[15px]">
-                                Successful Rentals<br />Completed<br />Worldwide.
-                            </p>
-                        </motion.div>
-                    </div>
+            {/* Animated Stats — Pinned to Bottom */}
+            <div className="absolute bottom-8 md:bottom-16 left-6 md:left-12 lg:left-16 z-10">
+                <div className="flex gap-10 md:gap-16">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.7 }}
+                        className="flex flex-col gap-1"
+                    >
+                        <span className="text-white text-[28px] md:text-[36px] leading-[40px] font-normal font-['Inter']">
+                            <AnimatedCounter target={settings?.stats_cars || 200} />
+                        </span>
+                        <p className="text-gray-300 text-[12px]">
+                            Luxury Sports Cars<br />Ready To Rent.
+                        </p>
+                    </motion.div>
+                    <div className="w-px h-12 bg-white/30" />
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.9 }}
+                        className="flex flex-col gap-1"
+                    >
+                        <span className="text-white text-[28px] md:text-[36px] leading-[40px] font-normal font-['Inter']">
+                            <AnimatedCounter target={settings?.stats_rentals || 5000} />
+                        </span>
+                        <p className="text-gray-300 text-[12px] leading-[15px]">
+                            Successful Rentals<br />Completed<br />Worldwide.
+                        </p>
+                    </motion.div>
                 </div>
             </div>
 

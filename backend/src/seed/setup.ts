@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS cars (
   image_url TEXT,
   description TEXT,
   available BOOLEAN DEFAULT true,
+  status VARCHAR(50) DEFAULT 'Available',
+  availability_days TEXT[] DEFAULT ARRAY['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

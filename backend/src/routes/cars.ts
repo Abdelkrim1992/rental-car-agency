@@ -34,6 +34,7 @@ router.get("/", async (req: Request, res: Response) => {
             brand: car.brand,
             location: car.location,
             description: car.description,
+            availability_days: car.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         }));
 
         res.json(cars);
@@ -68,6 +69,7 @@ router.get("/:id", async (req: Request, res: Response) => {
             brand: data.brand,
             location: data.location,
             description: data.description,
+            availability_days: data.availability_days || ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         });
     } catch (err) {
         console.error("Error fetching car:", err);
