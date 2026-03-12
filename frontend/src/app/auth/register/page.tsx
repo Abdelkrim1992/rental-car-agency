@@ -68,7 +68,7 @@ export default function RegisterPage() {
                             </div>
                             <h2 className="text-[18px] font-bold text-[#111827] mb-2">Registration Closed</h2>
                             <p className="text-gray-500 text-[14px] mb-6">An admin account has already been created. Only one admin is allowed.</p>
-                            <Link href="/auth/login" className="bg-black text-white rounded-full px-8 py-3 text-[12px] tracking-[1px] uppercase inline-block">
+                            <Link href="/auth/login" className="bg-[#111827] text-white rounded-full px-8 py-3.5 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md inline-block">
                                 Login Instead
                             </Link>
                         </div>
@@ -101,8 +101,11 @@ export default function RegisterPage() {
                                         </button>
                                     </div>
                                 </div>
-                                <button type="submit" disabled={loading}
-                                    className="w-full bg-black text-white rounded-full py-3.5 text-[12px] tracking-[1px] uppercase hover:bg-gray-800 transition-colors disabled:opacity-50">
+                                <button 
+                                    type="submit" 
+                                    disabled={loading}
+                                    className="w-full bg-[#111827] text-white rounded-full py-4 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
+                                >
                                     {loading ? "Creating admin..." : "Create Admin Account"}
                                 </button>
                             </form>

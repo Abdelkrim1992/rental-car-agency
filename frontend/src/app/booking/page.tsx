@@ -104,8 +104,8 @@ function BookingContent() {
                 </p>
                 <p className="text-gray-400 text-[13px] mb-8">We&apos;ll contact you at {form.guestEmail} to confirm.</p>
                 <div className="flex gap-4">
-                    <button onClick={() => router.push("/")} className="bg-black text-white rounded-full px-8 py-3 text-[12px] tracking-[1px] uppercase">Back Home</button>
-                    <button onClick={() => router.push("/cars")} className="border border-gray-300 rounded-full px-8 py-3 text-[12px] tracking-[1px] uppercase">Browse More</button>
+                    <button onClick={() => router.push("/")} className="bg-[#111827] text-white rounded-full px-8 py-3.5 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md">Back Home</button>
+                    <button onClick={() => router.push("/cars")} className="border border-gray-200 text-[#111827] rounded-full px-8 py-3.5 text-[13px] font-medium tracking-wide hover:border-[#111827] hover:bg-gray-50 active:scale-[0.98] transition-all duration-200">Browse More</button>
                 </div>
             </motion.div>
         );
@@ -174,8 +174,11 @@ function BookingContent() {
                                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-[14px] outline-none focus:border-black/30 resize-none transition-colors mt-1" placeholder="Any special requests..." />
                         </div>
 
-                        <button type="submit" disabled={loading || !car}
-                            className="w-full bg-black text-white rounded-full py-4 text-[12px] tracking-[1px] uppercase hover:bg-gray-800 transition-colors disabled:opacity-50">
+                        <button 
+                            type="submit" 
+                            disabled={loading || !car}
+                            className="w-full bg-[#111827] text-white rounded-full py-4 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
+                        >
                             {loading ? "Processing..." : "Submit Booking Request"}
                         </button>
                     </div>
@@ -218,7 +221,7 @@ function BookingContent() {
                     ) : (
                         <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
                             <p className="text-gray-400 text-[14px] mb-3">No car selected</p>
-                            <button onClick={() => router.push("/cars")} className="text-black text-[12px] tracking-[1px] uppercase underline">Browse Fleet</button>
+                            <button onClick={() => router.push("/cars")} className="bg-[#111827] text-white rounded-full px-6 py-2.5 text-[12px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.97] transition-all duration-200 shadow-sm">Browse Fleet</button>
                         </div>
                     )}
                 </div>

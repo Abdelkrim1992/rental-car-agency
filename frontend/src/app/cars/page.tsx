@@ -45,9 +45,9 @@ export default function CarsPage() {
 
     return (
         <div className="min-h-screen bg-white font-['Inter',sans-serif]">
-            <Navbar variant="transparent" />
+            <Navbar/>
             {/* Page Header */}
-            <div className="bg-[#18181b] text-white px-6 md:px-12 lg:px-24 pt-24 md:pt-28 pb-12 md:pb-16">
+            <div className="bg-[#18181b] text-white px-6 md:px-12 lg:px-24 pt-35 md:pt-45 pb-12 md:pb-16">
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -72,7 +72,10 @@ export default function CarsPage() {
                     <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="bg-gray-100 rounded-lg px-4 py-2.5 text-[12px] text-gray-600 border-none outline-none cursor-pointer">
                         {carLocations.map((l) => <option key={l} value={l}>{l}</option>)}
                     </select>
-                    <button onClick={() => { setSelectedType("All Types"); setSelectedBrand("All Brands"); setSelectedLocation("All Locations"); }} className="text-[12px] text-gray-400 hover:text-black transition-colors underline">
+                    <button 
+                        onClick={() => { setSelectedType("All Types"); setSelectedBrand("All Brands"); setSelectedLocation("All Locations"); }} 
+                        className="bg-gray-100 text-[#111827] rounded-full px-5 py-2 text-[12px] font-medium tracking-wide hover:bg-gray-200 active:scale-[0.97] transition-all duration-200"
+                    >
                         Clear Filters
                     </button>
                 </div>
@@ -92,13 +95,18 @@ export default function CarsPage() {
                                     <motion.div whileHover={{ y: 0 }} className="group cursor-pointer">
                                         <div className="bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
                                             <img loading="lazy" decoding="async" src={car.img} alt={car.name} className="w-full h-[280px] object-cover transition-transform duration-500 group-hover:scale-105" />
-                                            <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1">
+                                            <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1 z-10">
                                                 <span className="text-white text-[10px] tracking-[0.5px] uppercase">{car.type}</span>
+                                            </div>
+                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                <div className="bg-white text-[#111827] rounded-full px-6 py-2.5 text-[12px] font-medium tracking-wide shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                    View Details
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <h3 className="text-[#111827] text-[16px] font-bold">{car.name}</h3>
-                                            <span className="text-[#111827] text-[14px] font-semibold">{car.price}</span>
+                                            <span className="text-[#111827] text-[15px] font-extrabold">{car.price}</span>
                                         </div>
                                         <div className="flex items-center gap-3 mt-2">
                                             <span className="text-gray-400 text-[11px] bg-gray-100 px-2 py-0.5 rounded">{car.fuel}</span>

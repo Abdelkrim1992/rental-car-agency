@@ -66,12 +66,12 @@ export function WhyUsSection() {
                                             </motion.p>
                                         </div>
                                         <div className="flex-1 w-full px-4">
-                                            <div className="flex items-start justify-between mb-6">
+                                            {/* <div className="flex items-start justify-between mb-6">
                                                 <span className="text-black text-[24px] md:text-[30px] leading-[36px] font-bold font-['Inter']">{item.title}</span>
                                                 <div className="shrink-0 ml-4">
                                                     <ArrowIcon active={true} />
                                                 </div>
-                                            </div>
+                                            </div> */}
                                             <motion.div
                                                 initial={{ opacity: 0, scale: 0.98 }}
                                                 animate={{ opacity: 1, scale: 1 }}

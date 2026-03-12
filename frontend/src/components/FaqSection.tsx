@@ -47,7 +47,7 @@ export function FaqSection() {
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0 ml-4">
                                     <path d={svgPaths.pace200} stroke={i === activeIndex ? "#111827" : "#D1D5DB"} strokeWidth="1.5" />
                                     {i === activeIndex ? (
-                                        <path d={svgPaths.p26749ae8} stroke="#111827" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                                        <path d="M10 8L14 12L10 16" stroke="#111827" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
                                     ) : (
                                         <path d="M10 8L14 12L10 16" stroke="#D1D5DB" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
                                     )}

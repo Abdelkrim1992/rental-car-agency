@@ -80,7 +80,7 @@ export function BrowseCarsSection() {
                 <div className="flex items-center gap-2 text-[#1f2937] text-[12px] cursor-pointer hover:opacity-70 transition-opacity">
                     <Link
                         href="/cars"
-                        className="hidden md:block backdrop-blur-[5px] bg-white/20 border border-black rounded-full px-6 py-2 text-black text-[12px] tracking-[0.3px] uppercase hover:bg-black/30 transition-colors"
+                        className="hidden md:inline-flex items-center bg-[#111827] text-white rounded-full px-6 py-2.5 text-[12px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.97] transition-all duration-200 shadow-sm hover:shadow-md"
                     >
                         View All
                     </Link>
@@ -98,7 +98,7 @@ export function BrowseCarsSection() {
                 <div className="flex-1 relative">
                     <button
                         onClick={() => setOpenDropdown(openDropdown === "type" ? null : "type")}
-                        className="w-full flex items-center justify-between sm:border-r sm:border-gray-100 sm:pr-4 h-10 bg-gray-100 transition-colors px-2 rounded"
+                        className="w-full flex items-center justify-between sm:border-r sm:border-gray-100 sm:pr-4 h-10 bg-gray-100 transition-colors px-4 rounded"
                     >
                         <span className="text-gray-500 text-[12px]">{selectedType === "All Types" ? "Car Type" : selectedType}</span>
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -187,17 +187,17 @@ export function BrowseCarsSection() {
                         type="date"
                         value={pickupDate}
                         onChange={(e) => setPickupDate(e.target.value)}
-                        className="w-full h-10 bg-gray-100 rounded px-3 text-gray-500 text-[12px] outline-none border-none cursor-pointer"
+                        className="w-full h-10 bg-gray-100 rounded px-4 text-gray-500 text-[12px] outline-none border-none cursor-pointer"
                         placeholder="Pick Up Date"
                     />
                 </div>
 
                 <div className="sm:pl-4">
                     <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1 }}
+                        whileTap={{ scale: 1}}
                         onClick={() => { setCurrentPage(0); setOpenDropdown(null); }}
-                        className="bg-black rounded-full px-8 py-3 text-white text-[10px] tracking-[1px] uppercase w-full sm:w-auto hover:bg-gray-800 transition-colors"
+                        className="bg-[#111827] cursor-pointer text-white rounded-full px-10 py-3.5 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] transition-all duration-200 shadow-md hover:shadow-lg w-full sm:w-auto"
                     >
                         Search Car
                     </motion.button>
@@ -221,13 +221,22 @@ export function BrowseCarsSection() {
                                     transition={{ type: "spring", stiffness: 300 }}
                                     className="cursor-pointer group"
                                 >
-                                    <div className="bg-gray-100 rounded-2xl overflow-hidden mb-4">
+                                    <div className="bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
                                         <img loading="lazy" decoding="async" src={car.img} alt={car.name} className="w-full h-[250px] md:h-[300px] object-cover transition-transform duration-500 group-hover:scale-105" />
+                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <div className="bg-white text-[#111827] rounded-full px-6 py-2.5 text-[12px] font-medium tracking-wide shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                View Details
+                                            </div>
+                                        </div>
                                     </div>
-                                    <h3 className="text-[#111827] text-[14px] leading-[20px] font-bold font-['Inter']">{car.name}</h3>
-                                    <div className="flex items-center justify-between mt-1">
-                                        <span className="text-gray-500 text-[10px]">{car.price}</span>
-                                        <span className="text-gray-500 text-[10px]">{car.fuel} • Mileage: {car.mileage}</span>
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-[#111827] text-[14px] leading-[20px] font-bold font-['Inter']">{car.name}</h3>
+                                        <span className="text-[#111827] text-[14px] font-semibold">{car.price}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <span className="text-gray-500 text-[10px]">{car.fuel}</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="text-gray-500 text-[10px]">Mileage: {car.mileage}</span>
                                     </div>
                                 </motion.div>
                             </Link>
@@ -244,28 +253,28 @@ export function BrowseCarsSection() {
             {/* Navigation Arrows */}
             <div className="flex items-center justify-center gap-4">
                 <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1 }}
+                    whileTap={{ scale: 1 }}
                     onClick={handlePrev}
                     disabled={currentPage === 0}
                     className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${currentPage === 0 ? "border-gray-200 opacity-50 cursor-not-allowed" : "border-gray-300 hover:border-black"
                         }`}
                 >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d={svgPaths.p3f953000} stroke={currentPage === 0 ? "#9CA3AF" : "#111827"} strokeLinecap="round" strokeLinejoin="round" />
+                        <path d={svgPaths.p3f953000} stroke={currentPage === 0 ? "#9ca3afff" : "#9ca3afff"} strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 </motion.button>
                 <span className="text-gray-400 text-[12px]">{currentPage + 1} / {Math.max(totalPages, 1)}</span>
                 <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1 }}
+                    whileTap={{ scale: 1 }}
                     onClick={handleNext}
                     disabled={currentPage >= totalPages - 1}
-                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${currentPage >= totalPages - 1 ? "border-gray-200 opacity-50 cursor-not-allowed" : "border-black hover:bg-black hover:text-white"
+                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${currentPage >= totalPages - 1 ? "border-gray-200 opacity-50 cursor-not-allowed" : "border-black cursor-pointer hover:text-white"
                         }`}
                 >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d={svgPaths.p43eff00} stroke={currentPage >= totalPages - 1 ? "#9CA3AF" : "black"} strokeLinecap="round" strokeLinejoin="round" />
+                        <path d={svgPaths.p43eff00} stroke={currentPage >= totalPages - 1 ? "#9CA3AF" : "#9ca3afff"} strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 </motion.button>
             </div>

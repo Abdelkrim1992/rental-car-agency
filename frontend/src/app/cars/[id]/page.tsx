@@ -72,7 +72,7 @@ export default function CarDetailPage() {
                     <div className="text-center">
                         <h1 className="text-[48px] font-bold text-[#111827] mb-4">404</h1>
                         <p className="text-gray-500 mb-6">Car not found</p>
-                        <Link href="/cars" className="bg-black text-white rounded-full px-8 py-3 text-[12px] tracking-[1px] uppercase">Browse Fleet</Link>
+                        <Link href="/cars" className="bg-[#111827] text-white rounded-full px-8 py-3.5 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.97] transition-all duration-200 shadow-md">Browse Fleet</Link>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@ export default function CarDetailPage() {
     return (
         <div className="min-h-screen bg-white font-['Inter',sans-serif]">
             <Navbar variant="transparent" />
-            <div className="px-6 md:px-12 lg:px-24 pt-24 md:pt-28 pb-10">
+            <div className="px-6 md:px-12 lg:px-24 pt-35 md:pt-35 pb-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="bg-gray-100 rounded-3xl overflow-hidden">
                         <img src={car.img} alt={car.name} className="w-full h-[400px] lg:h-[500px] object-cover" />
@@ -143,12 +143,18 @@ export default function CarDetailPage() {
                             </div>
                         </div>
                         <div className="flex gap-4">
-                            <button onClick={handleBookNow} className="flex-1 bg-black text-white rounded-full py-4 text-center text-[12px] tracking-[1px] uppercase font-medium hover:bg-gray-800 transition-colors">
-                                Book Now
-                            </button>
-                            <Link href="/cars" className="border border-gray-200 rounded-full px-8 py-4 text-[12px] tracking-[1px] uppercase hover:border-black transition-colors">
-                                View Others
-                            </Link>
+                             <button 
+                                 onClick={handleBookNow} 
+                                 className="flex-1 bg-[#111827] text-white rounded-full py-4 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg"
+                             >
+                                 Book Now
+                             </button>
+                             <Link 
+                                 href="/cars" 
+                                 className="flex-1 text-center border border-gray-200 text-[#111827] rounded-full px-8 py-4 text-[13px] font-medium tracking-wide hover:border-[#111827] hover:bg-gray-50 active:scale-[0.98] transition-all duration-200"
+                             >
+                                 View Others
+                             </Link>
                         </div>
                     </motion.div>
                 </div>

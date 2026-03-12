@@ -150,12 +150,12 @@ export function ContactSection() {
                                     />
                                 </div>
                                 <motion.button
-                                    whileHover={{ scale: 1 }}
-                                    whileTap={{ scale: 1 }}
+                                    whileHover={{ scale: 1.00 }}
+                                    whileTap={{ scale: 1.00 }}
                                     type="submit"
-                                    className="bg-white text-black rounded-full py-3.5 text-[11px] tracking-[1px] uppercase font-medium hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                                    className="bg-white text-black rounded-full py-3.5 text-[13px] font-medium tracking-wide cursor-pointer hover:bg-white transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-full"
                                 >
-                                    <Send size={14} />
+                                    <Send size={15} />
                                     Send Message
                                 </motion.button>
                             </form>
