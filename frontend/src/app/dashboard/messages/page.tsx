@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchMessages, markMessageRead, deleteMessage, deleteMessages, replyToMessage, Message } from "@/store/slices/messagesSlice";
 import { ConfirmModal } from "@/components/dashboard/ConfirmModal";
@@ -36,7 +37,7 @@ import {
 import { Mail, Phone, Clock, MoreVertical, Trash2, Eye, Inbox, Send, User, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
-export default function MessagesPage() {
+function MessagesContent() {
     const dispatch = useAppDispatch();
     const { messages, loading } = useAppSelector((state) => state.messages);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
@@ -50,9 +51,22 @@ export default function MessagesPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState("10");
 
+    const searchParams = useSearchParams();
+    const messageIdFromUrl = searchParams.get("id");
+
     useEffect(() => {
         dispatch(fetchMessages());
     }, [dispatch]);
+
+    // Handle deep link to specific message
+    useEffect(() => {
+        if (messageIdFromUrl && messages.length > 0) {
+            const msg = messages.find(m => m.id === messageIdFromUrl);
+            if (msg) {
+                handleOpenMessage(msg);
+            }
+        }
+    }, [messageIdFromUrl, messages]);
 
     const rows = parseInt(rowsPerPage);
     const pages = Math.ceil(messages.length / rows);
@@ -167,6 +181,7 @@ export default function MessagesPage() {
                         aria-label="Messages table"
                         removeWrapper
                         selectionMode="multiple"
+                        selectionBehavior="checkbox"
                         selectedKeys={selectedKeys}
                         onSelectionChange={setSelectedKeys}
                         onRowAction={(key) => handleOpenMessage(messages.find(m => m.id === key) as Message)}
@@ -373,5 +388,13 @@ export default function MessagesPage() {
                 }
             />
         </div>
+    );
+}
+
+export default function MessagesPage() {
+    return (
+        <Suspense fallback={<Skeleton className="w-full h-screen rounded-xl" />}>
+            <MessagesContent />
+        </Suspense>
     );
 }

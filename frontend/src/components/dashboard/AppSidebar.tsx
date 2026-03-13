@@ -110,18 +110,18 @@ export function AppSidebar({ isOpen = false, onClose }: AppSidebarProps) {
                     icon: Calendar,
                     isActive: isActive("/dashboard/bookings"),
                 },
-                {
-                    title: "Payments",
-                    url: "/dashboard/payments",
-                    icon: CreditCard,
-                    isActive: pathname.includes("/payments"),
-                    subItems: [
-                        {
-                            title: "Payment History",
-                            url: "/dashboard/payments",
-                        }
-                    ]
-                },
+                // {
+                //     title: "Payments",
+                //     url: "/dashboard/payments",
+                //     icon: CreditCard,
+                //     isActive: pathname.includes("/payments"),
+                //     subItems: [
+                //         {
+                //             title: "Payment History",
+                //             url: "/dashboard/payments",
+                //         }
+                //     ]
+                // },
                 {
                     title: "Finance",
                     url: "/dashboard/finance",

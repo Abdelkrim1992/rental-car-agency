@@ -118,7 +118,7 @@ export default function NotificationsPage() {
                                                 size="sm"
                                                 variant="light"
                                                 as={Link}
-                                                href={n.type === 'booking' ? `/dashboard/bookings/${n.resource_id}` : `/dashboard/messages`}
+                                                href={n.type === 'booking' ? `/dashboard/bookings/${n.resource_id}` : `/dashboard/messages?id=${n.resource_id}`}
                                                 onPress={() => handleMarkRead(n.id)}
                                             >
                                                 <Eye size={16} />

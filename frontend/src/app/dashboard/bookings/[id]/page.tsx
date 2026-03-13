@@ -117,6 +117,18 @@ export default function BookingDetailsPage() {
                                     <span className="break-all">{booking.guest_email || "No email"}</span>
                                 </p>
                             </div>
+
+                            {booking.guest_message && (
+                                <>
+                                    <Divider className="my-2" />
+                                    <div className="p-3 bg-primary-50/50 rounded-lg border border-primary-100">
+                                        <p className="text-tiny text-primary font-bold uppercase tracking-wider mb-2">Message from Guest</p>
+                                        <p className="text-sm text-default-700 italic leading-relaxed">
+                                            "{booking.guest_message}"
+                                        </p>
+                                    </div>
+                                </>
+                            )}
                         </CardBody>
                     </Card>
                 </div>

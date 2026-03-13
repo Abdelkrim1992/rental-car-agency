@@ -50,7 +50,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             title: n.title,
             description: n.description,
             time: n.created_at,
-            link: n.type === 'booking' ? `/dashboard/bookings/${n.resource_id}` : `/dashboard/messages`,
+            link: n.type === 'booking' ? `/dashboard/bookings/${n.resource_id}` : `/dashboard/messages?id=${n.resource_id}`,
             status: n.status
         }));
 

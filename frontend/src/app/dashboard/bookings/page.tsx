@@ -27,11 +27,13 @@ import {
 } from "@heroui/react";
 import { Phone, MapPin, Plus, MoreVertical, Check, X, Eye, Calendar, Car } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 
 export default function BookingsPage() {
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const { bookings, loading } = useAppSelector((state) => state.booking);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState("10");
@@ -158,8 +160,11 @@ export default function BookingsPage() {
                             aria-label="Bookings table"
                             removeWrapper
                             selectionMode="multiple"
+                            selectionBehavior="checkbox"
                             selectedKeys={selectedKeys}
                             onSelectionChange={setSelectedKeys}
+                            onRowAction={(key) => router.push(`/dashboard/bookings/${key}`)}
+                            className="cursor-pointer"
                         >
                             <TableHeader>
                                 <TableColumn>Status</TableColumn>
@@ -271,13 +276,13 @@ export default function BookingsPage() {
                                 <Card key={b.id} className="border-none bg-default-50 shadow-none">
                                     <CardBody className="p-4">
                                         <div className="flex justify-between items-start mb-3">
-                                            <div className="flex items-center gap-3">
+                                            <Link href={`/dashboard/bookings/${b.id}`} className="flex items-center gap-3 active:opacity-70 transition-opacity">
                                                 <Avatar name={b.guest_name} size="sm" />
                                                 <div>
                                                     <p className="text-sm font-bold">{b.guest_name}</p>
                                                     <p className="text-tiny text-default-500">{new Date(b.pickup_date).toLocaleDateString()}</p>
                                                 </div>
-                                            </div>
+                                            </Link>
                                             <Chip variant="flat" color={getStatusColor(b.status || "pending")} size="sm">
                                                 {b.status || "pending"}
                                             </Chip>

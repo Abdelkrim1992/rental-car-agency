@@ -40,7 +40,7 @@ function LoginContent() {
     };
 
     return (
-        <div className="flex items-center justify-center pt-28 pb-16 px-6">
+        <div className="flex items-center justify-center pt-40 pb-16 px-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[440px]">
                 <div className="text-center mb-8">
                     <h1 className="text-[28px] font-bold text-[#111827] mb-2">Welcome Back</h1>
@@ -89,7 +89,7 @@ function LoginContent() {
                     <button 
                         type="submit" 
                         disabled={loading} 
-                        className="w-full bg-[#111827] text-white rounded-full py-3.5 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
+                        className="w-full bg-[#111827] text-white rounded-full py-3 text-[13px] font-medium tracking-wide hover:bg-[#1f2937] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
                     >
                         {loading ? "Signing in..." : "Sign In"}
                     </button>
